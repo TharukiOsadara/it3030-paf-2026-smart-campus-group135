@@ -2,6 +2,7 @@ package com.smartcampus.config;
 
 import com.smartcampus.dto.ErrorResponse;
 import com.smartcampus.exception.ResourceNotFoundException;
+import com.smartcampus.exception.TicketNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,6 +24,16 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND.value(),
                 ex.getMessage(),
                 "Resource Not Found"
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(TicketNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleTicketNotFound(TicketNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                "Ticket Not Found"
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }

@@ -6,6 +6,7 @@ import AboutPage from './pages/AboutPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import HomePage from './pages/HomePage.jsx';
+import MaintenancePage from './pages/MaintenancePage.jsx';
 import PlaceholderPage from './pages/PlaceholderPage.jsx';
 
 function App() {
@@ -47,10 +48,7 @@ function App() {
             path="/maintenance"
             element={
               <PageShell>
-                <PlaceholderPage
-                  title="Maintenance"
-                  description="Maintenance tickets and technician communication will appear here."
-                />
+                <MaintenancePage />
               </PageShell>
             }
           />
