@@ -1,6 +1,10 @@
-import { Link } from 'react-router-dom'
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 const quickLinks = [
+  { to: '/profile', label: 'My Profile', hint: 'Personal information' },
   { to: '/resources', label: 'Facilities', hint: 'Catalogue & availability' },
   { to: '/bookings', label: 'Bookings', hint: 'Requests & approvals' },
   { to: '/maintenance', label: 'Maintenance', hint: 'Tickets & updates' },
@@ -14,6 +18,32 @@ const snapshot = [
 ]
 
 export default function DashboardPage() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && user) {
+      // Redirect based on role
+      if (user.role === 'TECHNICIAN') {
+        navigate('/technician-dashboard', { replace: true });
+      } else if (user.role === 'ADMIN') {
+        navigate('/admin/users', { replace: true });
+      } else {
+        // Regular users go to home page
+        navigate('/', { replace: true });
+      }
+    }
+  }, [user, loading, navigate]);
+
+  // Show loading while checking role
+  if (loading || user) {
+    return (
+      <div className="flex min-h-[70vh] items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#3B82F6] border-t-transparent" />
+      </div>
+    );
+  }
+
   return (
     <div>
       <header className="mb-10 border-b border-[#1F2937] pb-8">
@@ -41,7 +71,7 @@ export default function DashboardPage() {
           Quick access
         </h2>
         <p className="mt-1 text-sm text-[#94A3B8]">Open a module without using the top navigation.</p>
-        <ul className="mt-6 grid gap-4 sm:grid-cols-3">
+        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {quickLinks.map(({ to, label, hint }) => (
             <li key={to}>
               <Link
