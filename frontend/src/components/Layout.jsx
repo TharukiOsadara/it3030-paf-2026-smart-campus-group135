@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { HiMenuAlt3, HiX } from 'react-icons/hi';
+import ThemeSwitcher from "./ThemeSwitcher";
 
 const navLinkBase =
   'rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B82F6]';
@@ -57,6 +58,24 @@ export default function Layout({ children }) {
             </NavLink>
             {/* Add more links as needed */}
           </nav>
+          <div className="navbar__actions flex items-center gap-3">
+            <ThemeSwitcher />
+            {/* Example notification wrapper, replace with your logic if needed */}
+            <div className="notif-wrap">
+              {/* ... notifications ... */}
+            </div>
+            <button className="btn btn-gradient btn-sm" onClick={() => window.location.href = "/tickets/new"}>
+              + Report Issue
+            </button>
+            <Link to="/login" className="navbar__avatar" title="My Account">
+              <span>U</span>
+            </Link>
+            <button className="navbar__hamburger" onClick={() => setMobileOpen(!mobileOpen)}>
+              <span />
+              <span />
+              <span />
+            </button>
+          </div>
         </div>
       </header>
       <main className="flex-1">{children}</main>
