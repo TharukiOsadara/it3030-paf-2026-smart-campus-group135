@@ -38,7 +38,7 @@ public class ResourceController {
      * HTTP: 200 OK, 404 NOT FOUND
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Resource> getResourceById(@PathVariable Long id) {
+    public ResponseEntity<Resource> getResourceById(@PathVariable String id) {
         Resource resource = resourceService.getResourceById(id);
         return ResponseEntity.ok(resource);
     }
@@ -70,7 +70,7 @@ public class ResourceController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<Resource> updateResource(
-            @PathVariable Long id,
+            @PathVariable String id,
             @Valid @RequestBody ResourceRequestDTO request) {
         Resource resourceDetails = new Resource();
         resourceDetails.setName(request.getName());
@@ -91,7 +91,7 @@ public class ResourceController {
      * HTTP: 204 NO CONTENT, 404 NOT FOUND
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteResource(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteResource(@PathVariable String id) {
         resourceService.deleteResource(id);
         return ResponseEntity.noContent().build();
     }

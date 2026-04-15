@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookingRequestDTO {
-    private Long resourceId;
+    private String resourceId;
     private String bookingDate;
     private String startTime;
     private String endTime;

@@ -1,15 +1,13 @@
 package com.smartcampus.repository;
 
 import com.smartcampus.model.Resource;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface ResourceRepository extends JpaRepository<Resource, Long> {
+public interface ResourceRepository extends MongoRepository<Resource, String> {
 
     // MODULE A: Facilities & Assets Catalogue
 
@@ -31,8 +29,7 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
     /**
      * Find active resources by type and capacity
      */
-    @Query("SELECT r FROM Resource r WHERE r.status = com.smartcampus.model.Resource$ResourceStatus.ACTIVE AND r.type = :type AND r.capacity >= :capacity")
-    List<Resource> findAvailableByTypeAndCapacity(@Param("type") String type, @Param("capacity") Integer capacity);
+    List<Resource> findByStatusAndTypeAndCapacityGreaterThanEqual(Resource.ResourceStatus status, String type, Integer capacity);
 
     /**
      * Find resources with capacity greater than or equal to specified value
@@ -47,8 +44,10 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
     /**
      * Search resources by name or description (like)
      */
-    @Query("SELECT r FROM Resource r WHERE r.name LIKE CONCAT('%', :search, '%') OR r.location LIKE CONCAT('%', :search, '%') OR r.description LIKE CONCAT('%', :search, '%')")
-    List<Resource> searchResources(@Param("search") String search);
+        List<Resource> findByNameContainingIgnoreCaseOrLocationContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+            String name,
+            String location,
+            String description);
 
     /**
      * Find by status and type
@@ -58,10 +57,10 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
     /**
      * Count resources by type
      */
-    Long countByType(String type);
+    long countByType(String type);
 
     /**
      * Count active resources
      */
-    Long countByStatus(Resource.ResourceStatus status);
+    long countByStatus(Resource.ResourceStatus status);
 }

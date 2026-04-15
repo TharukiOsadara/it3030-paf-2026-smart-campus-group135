@@ -7,6 +7,9 @@ import ContactPage from './pages/ContactPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import HomePage from './pages/HomePage.jsx';
 import PlaceholderPage from './pages/PlaceholderPage.jsx';
+import BookingForm from './pages/booking/BookingForm.jsx';
+import MyBookings from './pages/booking/MyBookings.jsx';
+import AdminBookings from './pages/booking/AdminBookings.jsx';
 
 function App() {
   return (
@@ -36,10 +39,23 @@ function App() {
             path="/bookings"
             element={
               <PageShell>
-                <PlaceholderPage
-                  title="Bookings"
-                  description="Booking management and approval workflows will appear here."
-                />
+                <BookingForm />
+              </PageShell>
+            }
+          />
+          <Route
+            path="/bookings/my"
+            element={
+              <PageShell>
+                <MyBookings />
+              </PageShell>
+            }
+          />
+          <Route
+            path="/bookings/admin"
+            element={
+              <PageShell>
+                <AdminBookings />
               </PageShell>
             }
           />
@@ -62,3 +78,4 @@ function App() {
 }
 
 export default App;
+

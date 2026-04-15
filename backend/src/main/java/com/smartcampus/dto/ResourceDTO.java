@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResourceDTO {
-    private Long id;
+    private String id;
     private String name;
     private String type;
     private String location;

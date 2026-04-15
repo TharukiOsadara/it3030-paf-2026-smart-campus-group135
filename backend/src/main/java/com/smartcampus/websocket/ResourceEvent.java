@@ -21,7 +21,7 @@ public class ResourceEvent {
     private String action;
     
     @JsonProperty("resourceId")
-    private Long resourceId;
+    private String resourceId;
     
     @JsonProperty("resourceName")
     private String resourceName;
@@ -44,7 +44,7 @@ public class ResourceEvent {
     /**
      * Factory method for CREATE event
      */
-    public static ResourceEvent created(Long id, String name, String type, String location) {
+    public static ResourceEvent created(String id, String name, String type, String location) {
         return new ResourceEvent(
             "RESOURCE_CREATED",
             "CREATE",
@@ -61,7 +61,7 @@ public class ResourceEvent {
     /**
      * Factory method for UPDATE event
      */
-    public static ResourceEvent updated(Long id, String name, String type, String location, String status) {
+    public static ResourceEvent updated(String id, String name, String type, String location, String status) {
         return new ResourceEvent(
             "RESOURCE_UPDATED",
             "UPDATE",
@@ -78,7 +78,7 @@ public class ResourceEvent {
     /**
      * Factory method for DELETE event
      */
-    public static ResourceEvent deleted(Long id, String name) {
+    public static ResourceEvent deleted(String id, String name) {
         return new ResourceEvent(
             "RESOURCE_DELETED",
             "DELETE",
