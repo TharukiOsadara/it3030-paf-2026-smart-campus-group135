@@ -250,4 +250,72 @@ public class AuthController {
 
         return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
     }
+
+    /**
+     * PATCH /api/auth/change-email — Change email for authenticated users.
+     * Local users must provide currentPassword, OAuth2 users are allowed without it.
+     * Session is invalidated after success so the user can re-authenticate with the new email.
+     */
+    @PatchMapping("/change-email")
+    public ResponseEntity<?> changeEmail(
+            @RequestBody Map<String, String> request,
+            Principal principal,
+            HttpServletRequest httpServletRequest) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "User not authenticated"));
+        }
+
+        String currentEmail = principal.getName();
+        Optional<UserDocument> userOpt = userDocumentRepository.findByEmail(currentEmail);
+        if (!userOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "User not found"));
+        }
+
+        UserDocument user = userOpt.get();
+        String newEmail = request.get("newEmail");
+        String currentPassword = request.get("currentPassword");
+
+        if (newEmail == null || newEmail.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "New email is required"));
+        }
+
+        String normalizedNewEmail = newEmail.trim();
+        if (normalizedNewEmail.equalsIgnoreCase(user.getEmail())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "New email must be different from current email"));
+        }
+
+        if (userDocumentRepository.existsByEmail(normalizedNewEmail)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "An account with this email already exists"));
+        }
+
+        // Require password verification for local users.
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            if (currentPassword == null || currentPassword.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "Current password is required"));
+            }
+            if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("message", "Current password is incorrect"));
+            }
+        }
+
+        user.setEmail(normalizedNewEmail);
+        userDocumentRepository.save(user);
+
+        SecurityContextHolder.clearContext();
+        HttpSession session = httpServletRequest.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Email changed successfully. Please log in again with your new email."
+        ));
+    }
 }

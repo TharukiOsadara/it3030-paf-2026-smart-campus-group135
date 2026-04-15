@@ -79,6 +79,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/resources/**").permitAll()
                 .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/oauth2/**", "/login/**").permitAll()
+                // Self-service user endpoints
+                .requestMatchers("/api/users/account", "/api/users/email-preferences").authenticated()
                 // Admin-only endpoints
                 .requestMatchers("/api/users/**").hasAuthority("ROLE_ADMIN")
                 // Authenticated-only endpoints
