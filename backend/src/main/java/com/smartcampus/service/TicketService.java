@@ -5,12 +5,10 @@ import com.smartcampus.model.Ticket;
 import com.smartcampus.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-@Transactional
 public class TicketService {
 
     @Autowired
@@ -20,7 +18,7 @@ public class TicketService {
         return ticketRepository.save(ticket);
     }
 
-    public Ticket getTicketById(Long id) {
+    public Ticket getTicketById(String id) {
         return ticketRepository.findById(id)
                 .orElseThrow(() -> new TicketNotFoundException(id));
     }
@@ -29,9 +27,9 @@ public class TicketService {
             Ticket.Status status,
             Ticket.Priority priority,
             String category,
-            Long assignedTo,
-            Long userId,
-            Long resourceId,
+            String assignedTo,
+            String userId,
+            String resourceId,
             String search
     ) {
         String normalizedSearch = (search != null && !search.isBlank()) ? search.trim() : null;
@@ -48,7 +46,7 @@ public class TicketService {
         );
     }
 
-    public Ticket updateTicket(Long id, Ticket ticketDetails) {
+    public Ticket updateTicket(String id, Ticket ticketDetails) {
         Ticket existing = getTicketById(id);
 
         existing.setTitle(ticketDetails.getTitle());
@@ -74,7 +72,7 @@ public class TicketService {
         return ticketRepository.save(existing);
     }
 
-    public void deleteTicket(Long id) {
+    public void deleteTicket(String id) {
         Ticket existing = getTicketById(id);
         ticketRepository.delete(existing);
     }

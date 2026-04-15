@@ -28,12 +28,12 @@ public class TicketRequestDTO {
     private String contactDetails;
 
     @NotNull(message = "User id is required")
-    private Long userId;
+    private String userId;
 
-    private Long resourceId; // Optional - if incident is for a specific resource
+    private String resourceId; // Optional - if incident is for a specific resource
 
     private String location;
     private Ticket.Status status;
-    private Long assignedTo;
+    private String assignedTo;
     private String resolutionNotes;
 }

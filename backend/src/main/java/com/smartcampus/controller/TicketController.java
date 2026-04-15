@@ -38,9 +38,9 @@ public class TicketController {
             @RequestParam(required = false) Ticket.Status status,
             @RequestParam(required = false) Ticket.Priority priority,
             @RequestParam(required = false) String category,
-            @RequestParam(required = false) Long assignedTo,
-            @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) Long resourceId,
+            @RequestParam(required = false) String assignedTo,
+            @RequestParam(required = false) String userId,
+            @RequestParam(required = false) String resourceId,
             @RequestParam(required = false) String search
     ) {
         List<Ticket> tickets = ticketService.getTickets(status, priority, category, assignedTo, userId, resourceId, search);
@@ -48,19 +48,19 @@ public class TicketController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Ticket> getTicketById(@PathVariable Long id) {
+    public ResponseEntity<Ticket> getTicketById(@PathVariable String id) {
         return ResponseEntity.ok(ticketService.getTicketById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Ticket> updateTicket(@PathVariable Long id, @Valid @RequestBody TicketRequestDTO request) {
+    public ResponseEntity<Ticket> updateTicket(@PathVariable String id, @Valid @RequestBody TicketRequestDTO request) {
         Ticket ticketDetails = mapRequestToTicket(request);
         Ticket updated = ticketService.updateTicket(id, ticketDetails);
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTicket(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTicket(@PathVariable String id) {
         ticketService.deleteTicket(id);
         return ResponseEntity.noContent().build();
     }

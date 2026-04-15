@@ -1,31 +1,32 @@
 package com.smartcampus.repository;
 
 import com.smartcampus.model.Ticket;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
 
 @Repository
-public interface TicketRepository extends JpaRepository<Ticket, Long> {
+public interface TicketRepository extends MongoRepository<Ticket, String> {
 
-    @Query("SELECT t FROM Ticket t WHERE " +
-            "(:status IS NULL OR t.status = :status) AND " +
-            "(:priority IS NULL OR t.priority = :priority) AND " +
-            "(:category IS NULL OR LOWER(t.category) = LOWER(:category)) AND " +
-            "(:assignedTo IS NULL OR t.assignedTo = :assignedTo) AND " +
-            "(:userId IS NULL OR t.userId = :userId) AND " +
-            "(:resourceId IS NULL OR t.resourceId = :resourceId) AND " +
-            "(:search IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(t.description) LIKE LOWER(CONCAT('%', :search, '%')))")
+    @Query("{ $and: [" +
+            "{ $or: [{ status: ?0 }, { status: { $exists: false } }] }, " +
+            "{ $or: [{ priority: ?1 }, { priority: { $exists: false } }] }, " +
+            "{ $or: [{ category: ?2 }, { category: { $exists: false } }] }, " +
+            "{ $or: [{ assignedTo: ?3 }, { assignedTo: { $exists: false } }] }, " +
+            "{ $or: [{ userId: ?4 }, { userId: { $exists: false } }] }, " +
+            "{ $or: [{ resourceId: ?5 }, { resourceId: { $exists: false } }] }, " +
+            "{ $or: [{ title: { $regex: ?6, $options: 'i' } }, { description: { $regex: ?6, $options: 'i' } }, { $expr: { $eq: [?6, null] } }] }" +
+            "]}")
     List<Ticket> findByFilters(
             @Param("status") Ticket.Status status,
             @Param("priority") Ticket.Priority priority,
             @Param("category") String category,
-            @Param("assignedTo") Long assignedTo,
-            @Param("userId") Long userId,
-            @Param("resourceId") Long resourceId,
+            @Param("assignedTo") String assignedTo,
+            @Param("userId") String userId,
+            @Param("resourceId") String resourceId,
             @Param("search") String search
     );
 }

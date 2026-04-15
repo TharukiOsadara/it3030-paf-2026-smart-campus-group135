@@ -2,7 +2,7 @@ package com.smartcampus.exception;
 
 public class TicketNotFoundException extends RuntimeException {
 
-    public TicketNotFoundException(Long id) {
+    public TicketNotFoundException(String id) {
         super("Ticket not found with id: " + id);
     }
 }
