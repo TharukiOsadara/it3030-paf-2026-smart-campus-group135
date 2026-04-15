@@ -78,18 +78,18 @@ export default function TechnicianProfile() {
       </div>
 
       {/* Profile card */}
-      <div className="max-w-2xl rounded-2xl border border-[#1F2937] bg-[#111827] p-6">
-        <div className="flex items-start gap-4">
+      <div className="rounded-2xl border border-[#1F2937] bg-[#111827] p-6">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
           {/* Avatar */}
-          <div>
+          <div className="flex-shrink-0">
             {user.picture ? (
               <img
                 src={user.picture}
                 alt={user.name}
-                className="h-20 w-20 rounded-xl object-cover"
+                className="h-24 w-24 rounded-xl object-cover"
               />
             ) : (
-              <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-purple-500/20 text-2xl font-bold text-purple-400">
+              <div className="flex h-24 w-24 items-center justify-center rounded-xl bg-purple-500/20 text-3xl font-bold text-purple-400">
                 {user.name?.charAt(0)?.toUpperCase() || '?'}
               </div>
             )}
@@ -97,10 +97,10 @@ export default function TechnicianProfile() {
 
           {/* User info */}
           <div className="flex-1">
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <h2 className="text-xl font-bold text-white">{user.name}</h2>
-                <p className="text-sm text-[#94A3B8]">{user.email}</p>
+                <h2 className="text-2xl font-bold text-white">{user.name}</h2>
+                <p className="mt-1 text-[#94A3B8]">{user.email}</p>
               </div>
               <button className="rounded-lg bg-purple-500 p-2 text-white hover:bg-purple-600">
                 <HiOutlinePencilSquare className="h-5 w-5" />
@@ -108,18 +108,18 @@ export default function TechnicianProfile() {
             </div>
 
             {/* Profile details */}
-            <div className="mt-4 grid grid-cols-3 gap-4">
+            <div className="mt-6 grid grid-cols-2 gap-6 lg:grid-cols-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#64748B]">Role</p>
-                <p className="mt-1 text-sm font-medium text-white">
-                  <span className="inline-block rounded-full px-2 py-0.5 text-xs font-semibold bg-purple-500/20 text-purple-400">
+                <p className="mt-2 text-sm font-medium text-white">
+                  <span className="inline-block rounded-full px-2.5 py-1 text-xs font-semibold bg-purple-500/20 text-purple-400">
                     {user.role}
                   </span>
                 </p>
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#64748B]">Member Since</p>
-                <p className="mt-1 text-sm font-medium text-white">
+                <p className="mt-2 text-sm font-medium text-white">
                   {user.createdAt
                     ? new Date(user.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -131,8 +131,14 @@ export default function TechnicianProfile() {
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#64748B]">Auth Provider</p>
-                <p className="mt-1 text-sm font-medium capitalize text-white">
+                <p className="mt-2 text-sm font-medium capitalize text-white">
                   {user.oauthProvider === 'local' ? 'Email' : 'Google'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#64748B]">Status</p>
+                <p className="mt-2 text-sm font-medium text-white">
+                  <span className="inline-block h-2 w-2 rounded-full bg-purple-500 mr-2"></span>Active
                 </p>
               </div>
             </div>
@@ -141,18 +147,18 @@ export default function TechnicianProfile() {
       </div>
 
       {/* Account settings section */}
-      <div className="max-w-2xl rounded-2xl border border-[#1F2937] bg-[#111827] p-6">
+      <div className="rounded-2xl border border-[#1F2937] bg-[#111827] p-6">
         <h3 className="text-base font-bold text-white">Account Settings</h3>
-        <div className="mt-4 space-y-2">
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
           <button 
             onClick={() => setShowPasswordModal(true)}
-            className="w-full rounded-lg border border-[#334155] bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10"
+            className="rounded-lg border border-[#334155] bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10"
           >
             Change Password
           </button>
           <button 
             onClick={() => setShowDeleteModal(true)}
-            className="w-full rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
+            className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
           >
             Delete Account
           </button>
