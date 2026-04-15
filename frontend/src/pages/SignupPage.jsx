@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { register, GOOGLE_LOGIN_URL } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
+import {
+  isNameValid,
+  isRestrictedEmailValid,
+  sanitizeEmailInput,
+  sanitizeNameInput,
+} from '../utils/formValidation';
 
 /**
  * Signup page with email/password registration form AND Google OAuth2 option.
@@ -20,13 +26,32 @@ export default function SignupPage() {
   }, [user, loading, navigate]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    let nextValue = value;
+    if (name === 'name') {
+      nextValue = sanitizeNameInput(value);
+    } else if (name === 'email') {
+      nextValue = sanitizeEmailInput(value);
+    }
+
+    setForm({ ...form, [name]: nextValue });
     if (error) setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (!isNameValid(form.name)) {
+      setError('Name can only contain letters and spaces');
+      return;
+    }
+
+    if (!isRestrictedEmailValid(form.email)) {
+      setError('Email can only contain letters, numbers, @ and .');
+      return;
+    }
 
     // Validate passwords match
     if (form.password !== form.confirmPassword) {
@@ -168,7 +193,7 @@ export default function SignupPage() {
               id="signup-submit-btn"
               type="submit"
               disabled={submitting}
-              className="w-full rounded-xl bg-[#10B981] px-6 py-3 text-base font-semibold text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-500 hover:shadow-[0_0_28px_rgba(16,185,129,0.5)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#10B981] disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-xl bg-[#10B981] px-6 py-3 text-base font-semibold text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-500 hover:shadow-[0_0_28px_rgba(16,185,129,0.5)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#10B981] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting ? (
                 <span className="flex items-center justify-center gap-2">
@@ -192,7 +217,7 @@ export default function SignupPage() {
           <button
             id="google-signup-btn"
             onClick={handleGoogleSignup}
-            className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#334155] bg-white/[0.03] px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#10B981]/50 hover:bg-white/[0.07] hover:shadow-[0_0_24px_rgba(16,185,129,0.15)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#10B981]"
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#334155] bg-white/[0.03] px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#10B981]/50 hover:bg-white/[0.07] hover:shadow-[0_0_24px_rgba(16,185,129,0.15)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#10B981]"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />

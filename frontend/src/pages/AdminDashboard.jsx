@@ -2,6 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getAllUsers, deleteUser, updateUser, changeUserRole } from '../services/userService';
 import { HiOutlinePencilSquare, HiOutlineTrash, HiOutlineXMark, HiOutlineCheck } from 'react-icons/hi2';
+import {
+  isNameValid,
+  isRestrictedEmailValid,
+  sanitizeEmailInput,
+  sanitizeNameInput,
+} from '../utils/formValidation';
 
 /**
  * Admin dashboard — user management table with CRUD and role change (Member 4).
@@ -52,6 +58,16 @@ export default function AdminDashboard() {
   };
 
   const handleEditSave = async (id) => {
+    if (!isNameValid(editForm.name)) {
+      alert('Name can only contain letters and spaces');
+      return;
+    }
+
+    if (!isRestrictedEmailValid(editForm.email)) {
+      alert('Email can only contain letters, numbers, @ and .');
+      return;
+    }
+
     try {
       setActionLoading(id);
       const updated = await updateUser(id, editForm);
@@ -163,7 +179,9 @@ export default function AdminDashboard() {
                       <input
                         type="text"
                         value={editForm.name}
-                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, name: sanitizeNameInput(e.target.value) })
+                        }
                         className="w-full rounded-lg border border-[#334155] bg-[#0F172A] px-3 py-1.5 text-sm text-white outline-none focus:border-[#3B82F6]"
                       />
                     ) : (
@@ -180,7 +198,9 @@ export default function AdminDashboard() {
                       <input
                         type="email"
                         value={editForm.email}
-                        onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, email: sanitizeEmailInput(e.target.value) })
+                        }
                         className="w-full rounded-lg border border-[#334155] bg-[#0F172A] px-3 py-1.5 text-sm text-white outline-none focus:border-[#3B82F6]"
                       />
                     ) : (
