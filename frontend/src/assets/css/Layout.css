@@ -1,15 +1,18 @@
 /* Layout shell */
 .layout {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--gradient-hero);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .layout__main {
   flex: 1;
   width: min(1200px, 100% - 32px);
-  margin: 96px auto 32px;
+  margin: 80px auto 24px;
+  padding-bottom: 12px;
 }
 
 /* Navbar */
@@ -249,8 +252,9 @@
 /* Footer */
 .footer {
   border-top: 1px solid var(--border-subtle);
-  margin-top: 32px;
+  margin-top: auto;
   background: var(--bg-surface);
+  flex-shrink: 0;
 }
 
 .footer__inner,
@@ -260,7 +264,7 @@
 }
 
 .footer__inner {
-  padding: 28px 0 22px;
+  padding: 20px 0 16px;
   display: grid;
   gap: 24px;
   grid-template-columns: 1.2fr 1fr;
@@ -268,7 +272,7 @@
 
 .footer__tagline {
   color: var(--text-secondary);
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
 .footer__links {
@@ -292,13 +296,14 @@
 }
 
 .footer__bottom {
-  padding: 14px 0 18px;
+  padding: 10px 0 12px;
   border-top: 1px solid var(--border-subtle);
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
   color: var(--text-muted);
+  font-size: 0.85rem;
 }
 
 .footer__bottom-links {
