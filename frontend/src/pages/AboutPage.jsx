@@ -1,174 +1,164 @@
-import { Link } from 'react-router-dom'
-import {
-  HiOutlineAcademicCap,
-  HiOutlineBuildingLibrary,
-  HiOutlineUserGroup,
-} from 'react-icons/hi2'
+import { useEffect, useRef } from "react";
+import "./AboutPage.css";
 
-const pillars = [
-  {
-    title: 'Who we serve',
-    body: 'Faculty, administrative staff, technicians, and students who rely on shared spaces, labs, and equipment every day. Smart Campus is built so everyone sees the same source of truth.',
-    Icon: HiOutlineUserGroup,
-  },
-  {
-    title: 'What we solve',
-    body: 'Scattered spreadsheets, unclear room availability, slow maintenance follow-up, and missed updates. We bring bookings, facilities data, tickets, and notifications into one operations hub.',
-    Icon: HiOutlineBuildingLibrary,
-  },
-  {
-    title: 'Why it matters',
-    body: 'Modern universities run on coordination. When operations are transparent, campuses spend less time chasing status and more time teaching, learning, and maintaining world-class facilities.',
-    Icon: HiOutlineAcademicCap,
-  },
-]
+const TEAM = [
+  { name: "Ashan Perera",    role: "Facilities & Assets Module",     avatar: "A", color: "#0A84FF",  modules: ["Resources API", "Catalogue UI"] },
+  { name: "Dilmi Rathnayake",role: "Booking Management Module",      avatar: "D", color: "#00E5C3",  modules: ["Booking API", "Conflict Engine"] },
+  { name: "Kasun Fernando",  role: "Incident Tickets & Technicians", avatar: "K", color: "#FF3B30",  modules: ["Tickets API", "Attachments", "Comments"] },
+  { name: "Nimesha Silva",   role: "Notifications & OAuth",          avatar: "N", color: "#FF9F0A",  modules: ["WebSocket", "Google OAuth", "Roles"] },
+];
+
+const TECH_STACK = [
+  { name: "Spring Boot 3",      category: "Backend",  color: "#6DB33F", desc: "REST API with layered architecture" },
+  { name: "React 18 + Vite",    category: "Frontend", color: "#61DAFB", desc: "SPA with hooks and React Router" },
+  { name: "MongoDB Atlas",      category: "Database", color: "#47A248", desc: "Document store for all collections" },
+  { name: "Spring Security",    category: "Security", color: "#0A84FF", desc: "OAuth2 + JWT + RBAC" },
+  { name: "WebSocket / STOMP",  category: "Realtime", color: "#FF9F0A", desc: "Live notification delivery" },
+  { name: "GitHub Actions",     category: "CI/CD",    color: "#2088FF", desc: "Automated build & test pipeline" },
+  { name: "Lombok + MapStruct", category: "Tools",    color: "#BC4520", desc: "Reduced boilerplate, DTO mapping" },
+  { name: "JUnit 5 + Mockito",  category: "Testing",  color: "#25A162", desc: "Unit & integration tests" },
+];
+
+const MODULES = [
+  { letter: "A", title: "Facilities & Assets",      desc: "Catalogue of bookable resources with search & filtering.",         color: "var(--color-primary)" },
+  { letter: "B", title: "Booking Management",        desc: "PENDING → APPROVED/REJECTED workflow with conflict detection.",    color: "var(--color-accent)" },
+  { letter: "C", title: "Incident Ticketing",        desc: "OPEN → IN_PROGRESS → RESOLVED → CLOSED with attachments.",        color: "var(--color-danger)" },
+  { letter: "D", title: "Notifications",             desc: "Real-time alerts for every key workflow event.",                   color: "var(--color-warn)" },
+  { letter: "E", title: "Auth & Authorization",      desc: "Google OAuth 2.0 + role-based access control.",                   color: "var(--color-info)" },
+];
 
 export default function AboutPage() {
+  const cardsRef = useRef([]);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) => entries.forEach(e => e.target.classList.toggle("in-view", e.isIntersecting)),
+      { threshold: 0.1 }
+    );
+    cardsRef.current.forEach(el => el && obs.observe(el));
+    return () => obs.disconnect();
+  }, []);
+
   return (
-    <div className="bg-[#020617]">
-      <section
-        className="relative overflow-hidden border-b border-[#1F2937] bg-gradient-to-b from-[#020617] via-[#050816] to-[#0a0f1c] px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:px-8"
-        aria-labelledby="about-hero-heading"
-      >
-        <div
-          className="pointer-events-none absolute -left-32 top-0 h-72 w-72 rounded-full bg-[#3B82F6]/18 blur-[100px]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute bottom-0 right-0 h-64 w-64 rounded-full bg-blue-500/12 blur-[90px]"
-          aria-hidden
-        />
-
-        <div className="relative mx-auto max-w-3xl text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#3B82F6]">About us</p>
-          <h1
-            id="about-hero-heading"
-            className="mt-3 text-4xl font-bold tracking-tight text-white sm:text-5xl"
-          >
-            The story behind{' '}
-            <span className="text-[#3B82F6]">Smart Campus</span>
+    <div className="about-page page-wrapper">
+      {/* ── HERO ── */}
+      <section className="about-hero">
+        <div className="about-hero__bg">
+          <div className="about-orb about-orb--1" />
+          <div className="about-orb about-orb--2" />
+        </div>
+        <div className="about-hero__content">
+          <p className="about-hero__eyebrow animate-fadeInUp">IT3030 · PAF Assignment 2026 · SLIIT</p>
+          <h1 className="about-hero__headline animate-fadeInUp delay-100">
+            Smart Campus<br />
+            <span className="about-hero__accent">Operations Hub</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[#94A3B8]">
-            Smart Campus Operations Hub is a university modernization initiative for managing facilities,
-            bookings, maintenance, and campus-wide updates—aligned with the same vision as our public
-            homepage: clarity over clutter.
-          </p>
-          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-            <Link
-              to="/"
-              className="inline-flex min-h-[3rem] items-center justify-center rounded-xl border border-white/20 bg-white/[0.04] px-8 text-base font-semibold text-white backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/[0.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
-            >
-              Back to home
-            </Link>
-            <Link
-              to="/dashboard"
-              className="inline-flex min-h-[3rem] items-center justify-center rounded-xl bg-[#3B82F6] px-8 text-base font-semibold text-white shadow-[0_0_28px_rgba(59,130,246,0.45)] transition-all hover:bg-blue-500 hover:shadow-[0_0_36px_rgba(59,130,246,0.55)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
-            >
-              Open dashboard
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section
-        className="border-b border-[#1F2937] px-4 py-16 sm:px-6 lg:px-8 lg:py-20"
-        aria-labelledby="mission-heading"
-      >
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 id="mission-heading" className="text-2xl font-bold text-white sm:text-3xl">
-            Mission
-          </h2>
-          <p className="mt-4 text-lg leading-relaxed text-[#94A3B8]">
-            To give every campus stakeholder a single, trustworthy place to discover resources, schedule
-            space, report and track issues, and stay informed—without juggling disconnected tools.
+          <p className="about-hero__sub animate-fadeInUp delay-200">
+            A production-grade university management platform developed as a group coursework project
+            for the Programming Applications and Frameworks (IT3030) module at SLIIT.
           </p>
         </div>
       </section>
 
-      <section
-        className="px-4 py-16 sm:px-6 lg:px-8 lg:py-20"
-        aria-labelledby="pillars-heading"
-      >
-        <div className="mx-auto max-w-7xl">
-          <h2
-            id="pillars-heading"
-            className="text-center text-2xl font-bold text-white sm:text-3xl"
-          >
-            Built for real campus life
-          </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-center text-[#94A3B8]">
-            The same modules you see on the home page—facilities, bookings, maintenance, and
-            notifications—reflect how teams actually work together.
-          </p>
-          <ul className="mt-12 grid gap-6 lg:grid-cols-3">
-            {pillars.map(({ title, body, Icon }) => (
-              <li
-                key={title}
-                className="rounded-2xl border border-[#1F2937] bg-[#111827] p-8 shadow-lg shadow-black/25"
-              >
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/15 text-[#3B82F6] ring-1 ring-blue-500/25">
-                  <Icon className="h-6 w-6" aria-hidden />
-                </span>
-                <h3 className="mt-5 text-lg font-semibold text-white">{title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-[#94A3B8]">{body}</p>
-              </li>
+      {/* ── MODULES ── */}
+      <section className="section about-modules">
+        <div className="about-section-header">
+          <p className="about-eyebrow" style={{color:"var(--color-accent)"}}>Core Modules</p>
+          <h2 className="section-title">Five modules,<br /><span style={{color:"var(--color-accent)"}}>one platform.</span></h2>
+        </div>
+        <div className="about-modules__grid">
+          {MODULES.map((m, i) => (
+            <div
+              key={i}
+              className="module-card reveal-card"
+              ref={el => cardsRef.current[i] = el}
+              style={{ "--m-color": m.color, animationDelay: `${i * 0.1}s` }}
+            >
+              <div className="module-card__letter">{m.letter}</div>
+              <div>
+                <h3 className="module-card__title">{m.title}</h3>
+                <p className="module-card__desc">{m.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── TEAM ── */}
+      <section className="section about-team">
+        <div className="about-section-header">
+          <p className="about-eyebrow" style={{color:"var(--color-primary)"}}>The Team</p>
+          <h2 className="section-title">Built by<br /><span style={{color:"var(--color-primary)"}}>four engineers.</span></h2>
+        </div>
+        <div className="team-grid">
+          {TEAM.map((m, i) => (
+            <div
+              key={i}
+              className="team-card reveal-card"
+              ref={el => cardsRef.current[MODULES.length + i] = el}
+              style={{ "--t-color": m.color, animationDelay: `${i * 0.12}s` }}
+            >
+              <div className="team-card__avatar" style={{ background: m.color }}>
+                {m.avatar}
+              </div>
+              <h3 className="team-card__name">{m.name}</h3>
+              <p className="team-card__role">{m.role}</p>
+              <div className="team-card__tags">
+                {m.modules.map((mod, j) => (
+                  <span key={j} className="team-card__tag">{mod}</span>
+                ))}
+              </div>
+              <div className="team-card__glow" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── TECH STACK ── */}
+      <section className="section about-stack">
+        <div className="about-section-header">
+          <p className="about-eyebrow" style={{color:"var(--color-warn)"}}>Technology Stack</p>
+          <h2 className="section-title">Modern tools.<br /><span style={{color:"var(--color-warn)"}}>Production quality.</span></h2>
+        </div>
+        <div className="stack-grid">
+          {TECH_STACK.map((t, i) => (
+            <div key={i} className="stack-card reveal-card"
+              ref={el => cardsRef.current[MODULES.length + TEAM.length + i] = el}
+              style={{ animationDelay: `${i * 0.08}s` }}>
+              <div className="stack-card__dot" style={{ background: t.color, boxShadow: `0 0 10px ${t.color}` }} />
+              <div>
+                <div className="stack-card__name">{t.name}</div>
+                <div className="stack-card__category" style={{ color: t.color }}>{t.category}</div>
+                <div className="stack-card__desc">{t.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── ASSIGNMENT INFO ── */}
+      <section className="section about-info">
+        <div className="about-info__card">
+          <h2 className="about-info__title">Assignment Details</h2>
+          <div className="about-info__grid">
+            {[
+              ["Module",     "IT3030 – Programming Applications & Frameworks"],
+              ["Institution","Faculty of Computing, SLIIT"],
+              ["Weight",     "30% of Final Mark"],
+              ["Released",   "24 March 2026"],
+              ["Viva",       "Starting 11 April 2026"],
+              ["Deadline",   "27 April 2026 – 11:45 PM (GMT +5:30)"],
+              ["Stack",      "Spring Boot REST API + React Client"],
+              ["Database",   "MongoDB Atlas"],
+            ].map(([k, v], i) => (
+              <div key={i} className="about-info__row">
+                <span className="about-info__key">{k}</span>
+                <span className="about-info__val">{v}</span>
+              </div>
             ))}
-          </ul>
-        </div>
-      </section>
-
-      <section
-        className="border-t border-[#1F2937] bg-[#050816] px-4 py-16 sm:px-6 lg:px-8 lg:py-20"
-        aria-labelledby="academic-heading"
-      >
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 id="academic-heading" className="text-2xl font-bold text-white sm:text-3xl">
-            Academic context
-          </h2>
-          <p className="mt-4 text-[#94A3B8] leading-relaxed">
-            Smart Campus is developed as part of{' '}
-            <span className="font-medium text-white">IT3030 — Industry-Based Application Development</span>{' '}
-            at the Faculty of Computing, SLIIT. It is a team project demonstrating full-stack design:
-            REST APIs, a modern React client, persistence, and real-time updates where applicable.
-          </p>
-        </div>
-      </section>
-
-      <section
-        className="border-t border-[#1F2937] px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
-        aria-labelledby="about-cta-heading"
-      >
-        <div className="relative mx-auto max-w-2xl text-center">
-          <div
-            className="pointer-events-none absolute left-1/2 top-0 h-32 w-[min(100%,28rem)] -translate-x-1/2 rounded-full bg-[#3B82F6]/15 blur-[60px]"
-            aria-hidden
-          />
-          <h2
-            id="about-cta-heading"
-            className="relative text-2xl font-bold text-white sm:text-3xl"
-          >
-            Explore the platform
-          </h2>
-          <p className="relative mt-4 text-[#94A3B8]">
-            Start from the homepage highlights or jump straight into facilities and your personal
-            dashboard.
-          </p>
-          <div className="relative mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center sm:gap-4">
-            <Link
-              to="/"
-              className="inline-flex min-h-[3rem] items-center justify-center rounded-xl bg-[#3B82F6] px-8 text-base font-semibold text-white shadow-[0_0_28px_rgba(59,130,246,0.45)] transition-all hover:bg-blue-600"
-            >
-              View homepage
-            </Link>
-            <Link
-              to="/resources"
-              className="inline-flex min-h-[3rem] items-center justify-center rounded-xl border border-white/20 px-8 text-base font-semibold text-white transition-colors hover:border-white/35 hover:bg-white/5"
-            >
-              Browse facilities
-            </Link>
           </div>
         </div>
       </section>
     </div>
-  )
+  );
 }

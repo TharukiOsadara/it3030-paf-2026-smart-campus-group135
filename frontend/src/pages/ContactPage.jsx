@@ -1,205 +1,164 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { HiOutlineClock, HiOutlineEnvelope, HiOutlineMapPin } from 'react-icons/hi2'
+import { useEffect, useRef } from "react";
+import "./AboutPage.css";
 
-const CONTACT_EMAIL = 'operations@smartcampus.edu.lk'
+const TEAM = [
+  { name: "Ashan Perera",    role: "Facilities & Assets Module",     avatar: "A", color: "#0A84FF",  modules: ["Resources API", "Catalogue UI"] },
+  { name: "Dilmi Rathnayake",role: "Booking Management Module",      avatar: "D", color: "#00E5C3",  modules: ["Booking API", "Conflict Engine"] },
+  { name: "Kasun Fernando",  role: "Incident Tickets & Technicians", avatar: "K", color: "#FF3B30",  modules: ["Tickets API", "Attachments", "Comments"] },
+  { name: "Nimesha Silva",   role: "Notifications & OAuth",          avatar: "N", color: "#FF9F0A",  modules: ["WebSocket", "Google OAuth", "Roles"] },
+];
 
-const inputClass =
-  'mt-1.5 w-full rounded-xl border border-[#1F2937] bg-[#0f172a] px-4 py-3 text-sm text-white placeholder:text-[#64748B] transition-colors focus:border-[#3B82F6] focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30'
+const TECH_STACK = [
+  { name: "Spring Boot 3",      category: "Backend",  color: "#6DB33F", desc: "REST API with layered architecture" },
+  { name: "React 18 + Vite",    category: "Frontend", color: "#61DAFB", desc: "SPA with hooks and React Router" },
+  { name: "MongoDB Atlas",      category: "Database", color: "#47A248", desc: "Document store for all collections" },
+  { name: "Spring Security",    category: "Security", color: "#0A84FF", desc: "OAuth2 + JWT + RBAC" },
+  { name: "WebSocket / STOMP",  category: "Realtime", color: "#FF9F0A", desc: "Live notification delivery" },
+  { name: "GitHub Actions",     category: "CI/CD",    color: "#2088FF", desc: "Automated build & test pipeline" },
+  { name: "Lombok + MapStruct", category: "Tools",    color: "#BC4520", desc: "Reduced boilerplate, DTO mapping" },
+  { name: "JUnit 5 + Mockito",  category: "Testing",  color: "#25A162", desc: "Unit & integration tests" },
+];
 
-const labelClass = 'text-sm font-medium text-[#94A3B8]'
+const MODULES = [
+  { letter: "A", title: "Facilities & Assets",      desc: "Catalogue of bookable resources with search & filtering.",         color: "var(--color-primary)" },
+  { letter: "B", title: "Booking Management",        desc: "PENDING → APPROVED/REJECTED workflow with conflict detection.",    color: "var(--color-accent)" },
+  { letter: "C", title: "Incident Ticketing",        desc: "OPEN → IN_PROGRESS → RESOLVED → CLOSED with attachments.",        color: "var(--color-danger)" },
+  { letter: "D", title: "Notifications",             desc: "Real-time alerts for every key workflow event.",                   color: "var(--color-warn)" },
+  { letter: "E", title: "Auth & Authorization",      desc: "Google OAuth 2.0 + role-based access control.",                   color: "var(--color-info)" },
+];
 
-export default function ContactPage() {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [subject, setSubject] = useState('')
-  const [message, setMessage] = useState('')
-  const [sent, setSent] = useState(false)
+export default function AboutPage() {
+  const cardsRef = useRef([]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    const body = `Name: ${name}\nEmail: ${email}\n\n${message}`
-    const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`[Smart Campus] ${subject}`)}&body=${encodeURIComponent(body)}`
-    window.location.href = mailto
-    setSent(true)
-  }
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) => entries.forEach(e => e.target.classList.toggle("in-view", e.isIntersecting)),
+      { threshold: 0.1 }
+    );
+    cardsRef.current.forEach(el => el && obs.observe(el));
+    return () => obs.disconnect();
+  }, []);
 
   return (
-    <div className="bg-[#020617]">
-      <section
-        className="relative overflow-hidden border-b border-[#1F2937] bg-gradient-to-b from-[#020617] via-[#050816] to-[#0a0f1c] px-4 pb-12 pt-12 sm:px-6 sm:pb-16 sm:pt-16 lg:px-8"
-        aria-labelledby="contact-hero-heading"
-      >
-        <div
-          className="pointer-events-none absolute -right-24 top-0 h-64 w-64 rounded-full bg-[#3B82F6]/15 blur-[100px]"
-          aria-hidden
-        />
-        <div className="relative mx-auto max-w-3xl text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#3B82F6]">Contact us</p>
-          <h1
-            id="contact-hero-heading"
-            className="mt-3 text-4xl font-bold tracking-tight text-white sm:text-5xl"
-          >
-            We&apos;re here to <span className="text-[#3B82F6]">help</span>
+    <div className="about-page page-wrapper">
+      {/* ── HERO ── */}
+      <section className="about-hero">
+        <div className="about-hero__bg">
+          <div className="about-orb about-orb--1" />
+          <div className="about-orb about-orb--2" />
+        </div>
+        <div className="about-hero__content">
+          <p className="about-hero__eyebrow animate-fadeInUp">IT3030 · PAF Assignment 2026 · SLIIT</p>
+          <h1 className="about-hero__headline animate-fadeInUp delay-100">
+            Smart Campus<br />
+            <span className="about-hero__accent">Operations Hub</span>
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-[#94A3B8]">
-            Questions about facilities, bookings, or maintenance workflows? Send us a message and the
-            operations team will get back to you.
+          <p className="about-hero__sub animate-fadeInUp delay-200">
+            A production-grade university management platform developed as a group coursework project
+            for the Programming Applications and Frameworks (IT3030) module at SLIIT.
           </p>
         </div>
       </section>
 
-      <section className="px-4 py-14 sm:px-6 lg:px-8 lg:py-20" aria-labelledby="contact-form-heading">
-        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-5 lg:gap-16">
-          <div className="lg:col-span-3">
-            <h2 id="contact-form-heading" className="text-xl font-bold text-white sm:text-2xl">
-              Send a message
-            </h2>
-            <p className="mt-2 text-sm text-[#94A3B8]">
-              Opens your email app with your details filled in. Replace the address in code if you use a
-              different inbox.
-            </p>
-
-            {sent && (
-              <p
-                className="mt-4 rounded-xl border border-[#3B82F6]/30 bg-[#3B82F6]/10 px-4 py-3 text-sm text-[#93C5FD]"
-                role="status"
-              >
-                If your mail client did not open, email us directly at{' '}
-                <a href={`mailto:${CONTACT_EMAIL}`} className="font-semibold underline underline-offset-2">
-                  {CONTACT_EMAIL}
-                </a>
-                .
-              </p>
-            )}
-
-            <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="contact-name" className={labelClass}>
-                    Name
-                  </label>
-                  <input
-                    id="contact-name"
-                    name="name"
-                    type="text"
-                    autoComplete="name"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className={inputClass}
-                    placeholder="Your name"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="contact-email" className={labelClass}>
-                    Email
-                  </label>
-                  <input
-                    id="contact-email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className={inputClass}
-                    placeholder="you@university.edu"
-                  />
-                </div>
-              </div>
+      {/* ── MODULES ── */}
+      <section className="section about-modules">
+        <div className="about-section-header">
+          <p className="about-eyebrow" style={{color:"var(--color-accent)"}}>Core Modules</p>
+          <h2 className="section-title">Five modules,<br /><span style={{color:"var(--color-accent)"}}>one platform.</span></h2>
+        </div>
+        <div className="about-modules__grid">
+          {MODULES.map((m, i) => (
+            <div
+              key={i}
+              className="module-card reveal-card"
+              ref={el => cardsRef.current[i] = el}
+              style={{ "--m-color": m.color, animationDelay: `${i * 0.1}s` }}
+            >
+              <div className="module-card__letter">{m.letter}</div>
               <div>
-                <label htmlFor="contact-subject" className={labelClass}>
-                  Subject
-                </label>
-                <input
-                  id="contact-subject"
-                  name="subject"
-                  type="text"
-                  required
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  className={inputClass}
-                  placeholder="e.g. Lab booking question"
-                />
+                <h3 className="module-card__title">{m.title}</h3>
+                <p className="module-card__desc">{m.desc}</p>
               </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── TEAM ── */}
+      <section className="section about-team">
+        <div className="about-section-header">
+          <p className="about-eyebrow" style={{color:"var(--color-primary)"}}>The Team</p>
+          <h2 className="section-title">Built by<br /><span style={{color:"var(--color-primary)"}}>four engineers.</span></h2>
+        </div>
+        <div className="team-grid">
+          {TEAM.map((m, i) => (
+            <div
+              key={i}
+              className="team-card reveal-card"
+              ref={el => cardsRef.current[MODULES.length + i] = el}
+              style={{ "--t-color": m.color, animationDelay: `${i * 0.12}s` }}
+            >
+              <div className="team-card__avatar" style={{ background: m.color }}>
+                {m.avatar}
+              </div>
+              <h3 className="team-card__name">{m.name}</h3>
+              <p className="team-card__role">{m.role}</p>
+              <div className="team-card__tags">
+                {m.modules.map((mod, j) => (
+                  <span key={j} className="team-card__tag">{mod}</span>
+                ))}
+              </div>
+              <div className="team-card__glow" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── TECH STACK ── */}
+      <section className="section about-stack">
+        <div className="about-section-header">
+          <p className="about-eyebrow" style={{color:"var(--color-warn)"}}>Technology Stack</p>
+          <h2 className="section-title">Modern tools.<br /><span style={{color:"var(--color-warn)"}}>Production quality.</span></h2>
+        </div>
+        <div className="stack-grid">
+          {TECH_STACK.map((t, i) => (
+            <div key={i} className="stack-card reveal-card"
+              ref={el => cardsRef.current[MODULES.length + TEAM.length + i] = el}
+              style={{ animationDelay: `${i * 0.08}s` }}>
+              <div className="stack-card__dot" style={{ background: t.color, boxShadow: `0 0 10px ${t.color}` }} />
               <div>
-                <label htmlFor="contact-message" className={labelClass}>
-                  Message
-                </label>
-                <textarea
-                  id="contact-message"
-                  name="message"
-                  required
-                  rows={5}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  className={`${inputClass} resize-y min-h-[8rem]`}
-                  placeholder="How can we help?"
-                />
+                <div className="stack-card__name">{t.name}</div>
+                <div className="stack-card__category" style={{ color: t.color }}>{t.category}</div>
+                <div className="stack-card__desc">{t.desc}</div>
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <button
-                  type="submit"
-                  className="inline-flex min-h-[3rem] items-center justify-center rounded-xl bg-[#3B82F6] px-8 text-base font-semibold text-white shadow-[0_0_28px_rgba(59,130,246,0.45)] transition-all hover:bg-blue-500 hover:shadow-[0_0_36px_rgba(59,130,246,0.55)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
-                >
-                  Send via email
-                </button>
-                <Link
-                  to="/"
-                  className="text-center text-sm font-semibold text-[#3B82F6] hover:text-blue-400 sm:text-left"
-                >
-                  ← Back to home
-                </Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── ASSIGNMENT INFO ── */}
+      <section className="section about-info">
+        <div className="about-info__card">
+          <h2 className="about-info__title">Assignment Details</h2>
+          <div className="about-info__grid">
+            {[
+              ["Module",     "IT3030 – Programming Applications & Frameworks"],
+              ["Institution","Faculty of Computing, SLIIT"],
+              ["Weight",     "30% of Final Mark"],
+              ["Released",   "24 March 2026"],
+              ["Viva",       "Starting 11 April 2026"],
+              ["Deadline",   "27 April 2026 – 11:45 PM (GMT +5:30)"],
+              ["Stack",      "Spring Boot REST API + React Client"],
+              ["Database",   "MongoDB Atlas"],
+            ].map(([k, v], i) => (
+              <div key={i} className="about-info__row">
+                <span className="about-info__key">{k}</span>
+                <span className="about-info__val">{v}</span>
               </div>
-            </form>
+            ))}
           </div>
-
-          <aside className="lg:col-span-2">
-            <h2 className="text-lg font-semibold text-white">Other ways to reach us</h2>
-            <ul className="mt-6 space-y-4">
-              <li className="flex gap-4 rounded-2xl border border-[#1F2937] bg-[#111827] p-5">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/15 text-[#3B82F6] ring-1 ring-blue-500/25">
-                  <HiOutlineEnvelope className="h-5 w-5" aria-hidden />
-                </span>
-                <div>
-                  <p className="text-sm font-semibold text-white">Email</p>
-                  <a
-                    href={`mailto:${CONTACT_EMAIL}`}
-                    className="mt-1 text-sm text-[#94A3B8] transition-colors hover:text-[#3B82F6]"
-                  >
-                    {CONTACT_EMAIL}
-                  </a>
-                </div>
-              </li>
-              <li className="flex gap-4 rounded-2xl border border-[#1F2937] bg-[#111827] p-5">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/15 text-[#3B82F6] ring-1 ring-blue-500/25">
-                  <HiOutlineMapPin className="h-5 w-5" aria-hidden />
-                </span>
-                <div>
-                  <p className="text-sm font-semibold text-white">Office</p>
-                  <p className="mt-1 text-sm leading-relaxed text-[#94A3B8]">
-                    Faculty of Computing, SLIIT
-                    <br />
-                    Sri Lanka
-                  </p>
-                </div>
-              </li>
-              <li className="flex gap-4 rounded-2xl border border-[#1F2937] bg-[#111827] p-5">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/15 text-[#3B82F6] ring-1 ring-blue-500/25">
-                  <HiOutlineClock className="h-5 w-5" aria-hidden />
-                </span>
-                <div>
-                  <p className="text-sm font-semibold text-white">Response time</p>
-                  <p className="mt-1 text-sm text-[#94A3B8]">
-                    We aim to reply within <span className="text-white">2 business days</span> during term.
-                  </p>
-                </div>
-              </li>
-            </ul>
-          </aside>
         </div>
       </section>
     </div>
-  )
+  );
 }

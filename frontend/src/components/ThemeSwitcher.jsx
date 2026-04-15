@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import "./ThemeSwitcher.css";
+import "../assets/css/ThemeSwitcher.css";
 
 const THEMES = [
   { 

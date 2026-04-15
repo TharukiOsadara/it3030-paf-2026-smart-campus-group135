@@ -1,250 +1,273 @@
-import { Link } from 'react-router-dom'
-import {
-  HiOutlineBell,
-  HiOutlineCalendar,
-  HiOutlineSquares2X2,
-  HiOutlineWrenchScrewdriver,
-} from 'react-icons/hi2'
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "./HomePage.css";
 
-const heroHighlights = [
-  { value: '150+', label: 'Facilities live' },
-  { value: '24/7', label: 'Always accessible' },
-  { value: '100%', label: 'Unified platform' },
-]
+const STATS = [
+  { value: "1,240+", label: "Resources Managed" },
+  { value: "98.4%",  label: "Uptime SLA" },
+  { value: "3,800+", label: "Bookings Processed" },
+  { value: "<2 min", label: "Avg. Response Time" },
+];
 
-const features = [
+const FEATURES = [
   {
-    to: '/resources',
-    title: 'Facilities catalogue',
-    description:
-      'Browse and search lecture halls, labs, meeting rooms and equipment with real-time availability',
-    Icon: HiOutlineSquares2X2,
-    circleClass: 'bg-emerald-500/15 text-[#10B981] ring-1 ring-emerald-500/30',
+    icon: (
+      <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+    ),
+    color: "var(--color-primary)",
+    title: "Facilities Catalogue",
+    desc: "Browse and manage all campus resources — lecture halls, labs, meeting rooms, and equipment — with real-time availability.",
   },
   {
-    to: '/bookings',
-    title: 'Smart booking',
-    description:
-      'Request and manage bookings with automated conflict detection and approval workflows',
-    Icon: HiOutlineCalendar,
-    circleClass: 'bg-blue-500/15 text-[#3B82F6] ring-1 ring-blue-500/30',
+    icon: (
+      <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+    ),
+    color: "var(--color-accent)",
+    title: "Smart Bookings",
+    desc: "Request, approve, and manage facility bookings with automatic conflict detection and instant notifications.",
   },
   {
-    to: '/maintenance',
-    title: 'Maintenance tickets',
-    description:
-      'Report issues, track progress and communicate with technicians through the full lifecycle',
-    Icon: HiOutlineWrenchScrewdriver,
-    circleClass: 'bg-amber-500/15 text-[#F59E0B] ring-1 ring-amber-500/30',
+    icon: (
+      <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+      </svg>
+    ),
+    color: "var(--color-danger)",
+    title: "Incident Ticketing",
+    desc: "Report faults, attach evidence photos, and track resolution — from OPEN to CLOSED — with full technician updates.",
   },
   {
-    to: '/sign-in',
-    title: 'Real-time notifications',
-    description:
-      'Stay updated on booking approvals, ticket status changes and important campus updates',
-    Icon: HiOutlineBell,
-    circleClass: 'bg-red-500/15 text-[#EF4444] ring-1 ring-red-500/30',
+    icon: (
+      <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+    ),
+    color: "var(--color-warn)",
+    title: "Live Notifications",
+    desc: "Stay updated with real-time alerts for booking decisions, ticket progress, and new comments via WebSocket.",
   },
-]
+  {
+    icon: (
+      <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    ),
+    color: "var(--color-info)",
+    title: "Role-Based Security",
+    desc: "OAuth 2.0 Google sign-in with granular role management — USER, TECHNICIAN, and ADMIN — protecting every endpoint.",
+  },
+  {
+    icon: (
+      <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+        <line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+    ),
+    color: "var(--page-dashboard-accent)",
+    title: "Analytics Dashboard",
+    desc: "Visualize resource utilization, peak booking hours, and incident trends with an admin-level insight dashboard.",
+  },
+];
 
-const stats = [
-  { value: '150+', label: 'Facilities available', color: 'text-[#3B82F6]' },
-  { value: '2,400+', label: 'Bookings this month', color: 'text-[#10B981]' },
-  { value: '95%', label: 'Issue resolution rate', color: 'text-[#F59E0B]' },
-  { value: '24hr', label: 'Average response time', color: 'text-[#EF4444]' },
-]
+const TICKET_WORKFLOW = [
+  { label: "OPEN",        color: "var(--status-open)",        icon: "⚡" },
+  { label: "IN PROGRESS", color: "var(--status-in-progress)", icon: "🔧" },
+  { label: "RESOLVED",    color: "var(--status-resolved)",    icon: "✓" },
+  { label: "CLOSED",      color: "var(--status-closed)",      icon: "🔒" },
+];
 
 export default function HomePage() {
+  const navigate = useNavigate();
+  const heroRef = useRef(null);
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+  const [count, setCount] = useState({ r: 0, b: 0, t: 0 });
+
+  // Parallax mouse effect
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return;
+    const onMove = (e) => {
+      const rect = el.getBoundingClientRect();
+      setMousePos({
+        x: (e.clientX - rect.left) / rect.width,
+        y: (e.clientY - rect.top)  / rect.height,
+      });
+    };
+    el.addEventListener("mousemove", onMove);
+    return () => el.removeEventListener("mousemove", onMove);
+  }, []);
+
+  // Counting animation for stats
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCount({ r: 1240, b: 3800, t: 420 });
+    }, 600);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const gX = (mousePos.x - 0.5) * 30;
+  const gY = (mousePos.y - 0.5) * 20;
+
   return (
-    <div className="bg-[#020617]">
-      <section
-        className="relative overflow-hidden bg-gradient-to-b from-[#020617] via-[#050816] to-[#0a0f1c] px-4 pb-20 pt-12 sm:px-6 sm:pb-28 sm:pt-16 lg:px-8 lg:pb-32 lg:pt-20"
-        aria-labelledby="hero-heading"
-      >
-        <div
-          className="pointer-events-none absolute -left-40 top-0 h-[28rem] w-[28rem] rounded-full bg-[#3B82F6]/20 blur-[120px]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute left-1/2 top-1/3 h-72 w-96 -translate-x-1/2 rounded-full bg-[#3B82F6]/10 blur-[100px]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute -right-32 bottom-0 h-80 w-80 rounded-full bg-blue-500/15 blur-[110px]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute left-1/2 top-0 h-px w-[min(100%,48rem)] -translate-x-1/2 bg-gradient-to-r from-transparent via-[#3B82F6]/45 to-transparent"
-          aria-hidden
-        />
+    <div className="home-page">
+      {/* ── HERO ── */}
+      <section className="hero" ref={heroRef}>
+        {/* Ambient background */}
+        <div className="hero__bg">
+          <div className="hero__orb hero__orb--1" style={{ transform: `translate(${gX * 0.5}px, ${gY * 0.5}px)` }} />
+          <div className="hero__orb hero__orb--2" style={{ transform: `translate(${-gX * 0.3}px, ${-gY * 0.3}px)` }} />
+          <div className="hero__grid" />
+        </div>
 
-        <div className="relative mx-auto flex min-h-[min(78vh,52rem)] max-w-4xl flex-col items-center justify-center text-center">
-          <h1
-            id="hero-heading"
-            className="text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl md:text-6xl lg:text-[3.5rem]"
-          >
-            <span className="text-[#3B82F6]">Smart Campus</span>
-            <br />
-            <span className="text-white">Operations Hub</span>
-          </h1>
-          <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-[#94A3B8] sm:text-lg md:text-xl">
-            Book facilities, report issues, and track maintenance requests all in one unified platform—
-            built for staff and students who need clarity, not clutter.
-          </p>
-          <Link
-            to="/about"
-            className="mt-6 text-sm font-semibold text-[#3B82F6] transition-colors hover:text-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
-          >
-            About Smart Campus →
-          </Link>
-
-          <div className="mt-10 flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4">
-            <Link
-              to="/resources"
-              className="inline-flex min-h-[3rem] items-center justify-center rounded-xl bg-[#3B82F6] px-8 text-base font-semibold text-white shadow-[0_0_28px_rgba(59,130,246,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500 hover:shadow-[0_0_36px_rgba(59,130,246,0.55)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
-            >
-              Get started
-            </Link>
-            <a
-              href="#features"
-              className="inline-flex min-h-[3rem] items-center justify-center rounded-xl border border-white/20 bg-white/[0.04] px-8 text-base font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/[0.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
-            >
-              Learn more
-            </a>
+        <div className="hero__content">
+          {/* Eyebrow */}
+          <div className="hero__eyebrow animate-fadeInUp">
+            <span className="hero__eyebrow-dot" />
+            <span>SLIIT · Smart Campus Operations Hub</span>
           </div>
 
-          <ul
-            className="mt-16 flex w-full max-w-2xl flex-col gap-10 sm:mt-20 sm:flex-row sm:items-start sm:justify-center sm:gap-0 sm:divide-x sm:divide-white/10"
-            aria-label="Key highlights"
-          >
-            {heroHighlights.map(({ value, label }, i) => (
-              <li
-                key={label}
-                className="flex flex-col items-center px-6 text-center sm:min-w-[8.5rem]"
-              >
-                <span className="text-3xl font-bold tracking-tight text-[#3B82F6] sm:text-4xl">
-                  {value}
-                </span>
-                <span className="mt-1.5 text-sm font-medium text-[#94A3B8]">{label}</span>
-                {i < heroHighlights.length - 1 && (
-                  <span
-                    className="mt-6 block h-px w-12 bg-white/10 sm:hidden"
-                    aria-hidden
-                  />
+          {/* Headline */}
+          <h1 className="hero__headline animate-fadeInUp delay-100">
+            One Platform.<br />
+            <span className="hero__headline-grad">Every Campus</span><br />
+            Operation.
+          </h1>
+
+          {/* Subtext */}
+          <p className="hero__sub animate-fadeInUp delay-200">
+            Unified booking management, incident ticketing, and real-time notifications —
+            built with Spring Boot + React for the modern university.
+          </p>
+
+          {/* CTA */}
+          <div className="hero__ctas animate-fadeInUp delay-300">
+            <button className="btn btn-gradient btn-lg" onClick={() => navigate("/dashboard")}>
+              Open Dashboard
+              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+            <button className="btn btn-secondary btn-lg" onClick={() => navigate("/tickets/new")}>
+              Report an Incident
+            </button>
+          </div>
+
+          {/* Stats row */}
+          <div className="hero__stats animate-fadeInUp delay-400">
+            {STATS.map((s, i) => (
+              <div key={i} className="hero__stat">
+                <span className="hero__stat-val">{s.value}</span>
+                <span className="hero__stat-lbl">{s.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Floating card preview */}
+        <div className="hero__card-wrap animate-fadeInUp delay-300"
+          style={{ transform: `perspective(1000px) rotateY(${-gX * 0.3}deg) rotateX(${gY * 0.2}deg)` }}>
+          <div className="hero__card">
+            <div className="hero__card-header">
+              <span className="badge badge-open">● OPEN</span>
+              <span className="hero__card-id">#TK-042</span>
+            </div>
+            <div className="hero__card-title">Projector malfunction in Lab A-302</div>
+            <div className="hero__card-meta">
+              <span>🏢 Block A, Room 302</span>
+              <span>🔴 HIGH Priority</span>
+            </div>
+            <div className="hero__card-attachments">
+              <div className="hero__card-img" style={{background:"rgba(10,132,255,0.15)"}} />
+              <div className="hero__card-img" style={{background:"rgba(0,229,195,0.15)"}} />
+              <div className="hero__card-img" style={{background:"rgba(255,159,10,0.15)"}} />
+              <span className="hero__card-img-more">+2</span>
+            </div>
+            <div className="hero__card-footer">
+              <div className="hero__card-assignee">
+                <div className="hero__card-avatar">T</div>
+                <span>Technician: Ashan R.</span>
+              </div>
+              <button className="btn btn-primary btn-sm">View</button>
+            </div>
+            <div className="hero__card-progress">
+              <div className="hero__card-progress-fill" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── WORKFLOW STRIP ── */}
+      <section className="workflow-strip">
+        <div className="workflow-strip__inner">
+          <p className="workflow-strip__label">Ticket Workflow</p>
+          <div className="workflow-strip__steps">
+            {TICKET_WORKFLOW.map((step, i) => (
+              <div key={i} className="workflow-step">
+                <div className="workflow-step__dot" style={{ background: step.color, boxShadow: `0 0 12px ${step.color}` }}>
+                  {step.icon}
+                </div>
+                <span className="workflow-step__label" style={{ color: step.color }}>{step.label}</span>
+                {i < TICKET_WORKFLOW.length - 1 && (
+                  <div className="workflow-step__arrow">
+                    <svg width="24" height="12" fill="none">
+                      <path d="M0 6h20M14 1l6 5-6 5" stroke="var(--border-default)" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                  </div>
                 )}
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       </section>
 
-      <section
-        id="features"
-        className="relative scroll-mt-20 overflow-hidden border-t border-[#1F2937] bg-[#020617] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24"
-        aria-labelledby="features-heading"
-      >
-        <div
-          className="pointer-events-none absolute right-0 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-[#3B82F6]/8 blur-[90px]"
-          aria-hidden
-        />
-        <div className="relative mx-auto max-w-7xl">
-          <h2
-            id="features-heading"
-            className="text-center text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl"
-          >
-            Powerful features
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-center text-base text-[#94A3B8] sm:text-lg">
-            Everything you need to run campus operations in one place—discover, book, fix, and stay
-            informed without switching tools.
+      {/* ── FEATURES ── */}
+      <section className="features section">
+        <div className="features__header">
+          <p className="features__eyebrow">Platform Modules</p>
+          <h2 className="section-title">Everything you need,<br /><span style={{color:"var(--color-primary)"}}>built for campus life.</span></h2>
+          <p className="section-subtitle features__sub">
+            From reporting a damaged projector to booking a lecture hall, every operation
+            is managed through one cohesive, role-aware platform.
           </p>
+        </div>
 
-          <ul className="mt-14 grid gap-6 sm:grid-cols-2 lg:mt-16 lg:grid-cols-4 lg:gap-8">
-            {features.map(({ to, title, description, Icon, circleClass }) => (
-              <li key={title}>
-                <Link
-                  to={to}
-                  className="group flex h-full flex-col rounded-2xl border border-[#1F2937] bg-[#111827] p-6 shadow-lg shadow-black/30 transition-all duration-300 hover:-translate-y-1 hover:border-[#3B82F6]/35 hover:bg-[#151f2e] hover:shadow-[0_0_32px_rgba(59,130,246,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B82F6]"
-                >
-                  <span
-                    className={`mb-5 flex h-14 w-14 items-center justify-center rounded-2xl ${circleClass} transition-transform duration-300 group-hover:scale-105`}
-                  >
-                    <Icon className="h-7 w-7" aria-hidden />
-                  </span>
-                  <h3 className="text-lg font-semibold text-white">{title}</h3>
-                  <p className="mt-2 flex-1 text-sm leading-relaxed text-[#94A3B8]">
-                    {description}
-                  </p>
-                  <span className="mt-4 text-sm font-semibold text-[#3B82F6] opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
-                    Open module →
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <div className="features__grid">
+          {FEATURES.map((f, i) => (
+            <div key={i} className={`feature-card animate-fadeInUp delay-${(i % 3) * 100 + 100}`}
+              style={{ "--feature-color": f.color }}>
+              <div className="feature-card__icon">{f.icon}</div>
+              <h3 className="feature-card__title">{f.title}</h3>
+              <p className="feature-card__desc">{f.desc}</p>
+              <div className="feature-card__line" />
+            </div>
+          ))}
         </div>
       </section>
 
-      <section
-        className="relative overflow-hidden border-t border-[#1F2937] bg-[#050816] px-4 py-16 sm:px-6 lg:px-8 lg:py-20"
-        aria-labelledby="stats-heading"
-      >
-        <div
-          className="pointer-events-none absolute -left-20 bottom-0 h-56 w-56 rounded-full bg-[#3B82F6]/10 blur-[80px]"
-          aria-hidden
-        />
-        <div className="relative mx-auto max-w-7xl">
-          <h2
-            id="stats-heading"
-            className="text-center text-3xl font-bold tracking-tight text-white sm:text-4xl"
-          >
-            Platform statistics
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-center text-[#94A3B8]">
-            Snapshot metrics your team can rally around—clear numbers, zero noise.
-          </p>
-          <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map(({ value, label, color }) => (
-              <li
-                key={label}
-                className="rounded-2xl border border-[#1F2937] bg-[#111827] p-8 text-center shadow-lg shadow-black/25 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#334155] hover:shadow-[0_0_24px_rgba(59,130,246,0.08)]"
-              >
-                <p className={`text-4xl font-bold tracking-tight sm:text-5xl ${color}`}>
-                  {value}
-                </p>
-                <p className="mt-2 text-sm font-medium text-[#94A3B8]">{label}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section
-        className="relative overflow-hidden border-t border-[#1F2937] bg-[#020617] px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
-        aria-labelledby="cta-heading"
-      >
-        <div
-          className="pointer-events-none absolute left-1/2 top-0 h-48 w-[min(100%,36rem)] -translate-x-1/2 rounded-full bg-[#3B82F6]/12 blur-[80px]"
-          aria-hidden
-        />
-        <div className="relative mx-auto max-w-2xl text-center">
-          <h2
-            id="cta-heading"
-            className="text-3xl font-bold tracking-tight text-white sm:text-4xl"
-          >
-            Ready to streamline your campus?
-          </h2>
-          <p className="mt-4 text-lg leading-relaxed text-[#94A3B8]">
-            Join hundreds of staff and students already using Smart Campus for their daily operations
-          </p>
-          <Link
-            to="/sign-in"
-            className="mt-10 inline-flex min-h-[3rem] items-center justify-center rounded-xl bg-[#3B82F6] px-8 text-base font-semibold text-white shadow-[0_0_28px_rgba(59,130,246,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-[0_0_36px_rgba(59,130,246,0.55)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B82F6]"
-          >
-            Sign up with Google
-          </Link>
+      {/* ── CTA BANNER ── */}
+      <section className="home-cta">
+        <div className="home-cta__inner">
+          <div className="home-cta__text">
+            <h2 className="home-cta__title">Ready to streamline<br />your campus operations?</h2>
+            <p className="home-cta__sub">Get started in seconds — sign in with your university Google account.</p>
+          </div>
+          <div className="home-cta__actions">
+            <button className="btn btn-gradient btn-lg" onClick={() => navigate("/login")}>
+              Sign In with Google
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+              </svg>
+            </button>
+            <Link to="/about" className="btn btn-ghost btn-lg">Learn More</Link>
+          </div>
         </div>
       </section>
     </div>
-  )
+  );
 }
