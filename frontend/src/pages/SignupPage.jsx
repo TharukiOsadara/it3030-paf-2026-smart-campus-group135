@@ -137,7 +137,7 @@ export default function SignupPage() {
                 onChange={handleChange}
                 required
                 autoComplete="name"
-                placeholder="John Doe"
+                placeholder="Your name"
                 className="w-full rounded-xl border border-[#334155] bg-[#0F172A] px-4 py-3 text-sm text-white placeholder-[#64748B] outline-none transition-colors focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981]"
               />
             </div>
@@ -153,7 +153,7 @@ export default function SignupPage() {
                 onChange={handleChange}
                 required
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder="Your email"
                 className="w-full rounded-xl border border-[#334155] bg-[#0F172A] px-4 py-3 text-sm text-white placeholder-[#64748B] outline-none transition-colors focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981]"
               />
             </div>
