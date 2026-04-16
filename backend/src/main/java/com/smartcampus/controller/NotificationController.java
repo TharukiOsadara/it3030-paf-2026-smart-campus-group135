@@ -2,6 +2,8 @@ package com.smartcampus.controller;
 
 import com.smartcampus.dto.NotificationCreateDTO;
 import com.smartcampus.dto.NotificationDTO;
+import com.smartcampus.model.UserDocument;
+import com.smartcampus.repository.UserDocumentRepository;
 import com.smartcampus.service.NotificationService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -9,9 +11,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * REST controller for notification operations (Member 4).
@@ -22,9 +27,12 @@ import java.util.Map;
 public class NotificationController {
 
     private final NotificationService notificationService;
+    private final UserDocumentRepository userDocumentRepository;
 
-    public NotificationController(NotificationService notificationService) {
+    public NotificationController(NotificationService notificationService,
+                                  UserDocumentRepository userDocumentRepository) {
         this.notificationService = notificationService;
+        this.userDocumentRepository = userDocumentRepository;
     }
 
     /**
@@ -32,8 +40,9 @@ public class NotificationController {
      */
     @GetMapping
     public ResponseEntity<List<NotificationDTO>> getMyNotifications(
-            @AuthenticationPrincipal OAuth2User principal) {
-        String userId = principal.getAttribute("dbId");
+            Principal principal,
+            @AuthenticationPrincipal OAuth2User oAuth2User) {
+        String userId = resolveCurrentUserId(principal, oAuth2User);
         return ResponseEntity.ok(notificationService.getNotificationsByUserId(userId));
     }
 
@@ -42,8 +51,9 @@ public class NotificationController {
      */
     @GetMapping("/unread-count")
     public ResponseEntity<Map<String, Long>> getUnreadCount(
-            @AuthenticationPrincipal OAuth2User principal) {
-        String userId = principal.getAttribute("dbId");
+            Principal principal,
+            @AuthenticationPrincipal OAuth2User oAuth2User) {
+        String userId = resolveCurrentUserId(principal, oAuth2User);
         long count = notificationService.getUnreadCount(userId);
         return ResponseEntity.ok(Map.of("count", count));
     }
@@ -64,5 +74,31 @@ public class NotificationController {
     @PatchMapping("/{id}/read")
     public ResponseEntity<NotificationDTO> markAsRead(@PathVariable String id) {
         return ResponseEntity.ok(notificationService.markAsRead(id));
+    }
+
+    private String resolveCurrentUserId(Principal principal, OAuth2User oAuth2User) {
+        if (oAuth2User != null) {
+            String dbId = oAuth2User.getAttribute("dbId");
+            if (dbId != null && !dbId.isBlank()) {
+                return dbId;
+            }
+
+            String email = oAuth2User.getAttribute("email");
+            if (email != null && !email.isBlank()) {
+                Optional<UserDocument> userByEmail = userDocumentRepository.findByEmail(email);
+                if (userByEmail.isPresent()) {
+                    return userByEmail.get().getId();
+                }
+            }
+        }
+
+        if (principal != null && principal.getName() != null && !principal.getName().isBlank()) {
+            Optional<UserDocument> userByEmail = userDocumentRepository.findByEmail(principal.getName());
+            if (userByEmail.isPresent()) {
+                return userByEmail.get().getId();
+            }
+        }
+
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
     }
 }
