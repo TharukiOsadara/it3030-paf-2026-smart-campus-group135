@@ -3,7 +3,6 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { Bell } from "lucide-react";
 import { AppSidebar } from "./AppSidebar";
 import ThemeSwitcher from "./ThemeSwitcher";
-import "../assets/css/DashboardLayout.css";
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
