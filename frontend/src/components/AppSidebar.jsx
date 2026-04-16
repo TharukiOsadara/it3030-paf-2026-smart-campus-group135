@@ -1,24 +1,12 @@
 import { Building2, Calendar, Wrench, Bell, LayoutDashboard, User, LogOut, GraduationCap } from "lucide-react";
-import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarFooter,
-  useSidebar,
-} from "@/components/ui/sidebar";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import "../assets/css/AppSidebar.css";
 
 const mainItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Facilities", url: "/dashboard/facilities", icon: Building2 },
   { title: "Bookings", url: "/dashboard/bookings", icon: Calendar },
-  { title: "Incidents", url: "/dashboard/incidents", icon: Wrench },
+  { title: "Tickets", url: "/dashboard/tickets", icon: Wrench },
   { title: "Notifications", url: "/dashboard/notifications", icon: Bell },
 ];
 
@@ -26,71 +14,64 @@ const accountItems = [
   { title: "Profile", url: "/dashboard/profile", icon: User },
 ];
 
-export function AppSidebar() {
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
+export function AppSidebar({ collapsed = false, onNavigate }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const isActive = (path) => location.pathname === path;
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarContent>
-        <div className="p-4 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center shrink-0">
-            <GraduationCap className="w-5 h-5 text-primary-foreground" />
+    <aside className={`app-sidebar ${collapsed ? "app-sidebar--collapsed" : ""}`}>
+      <div className="app-sidebar__inner">
+        <div className="app-sidebar__brand">
+          <div className="app-sidebar__brand-icon">
+            <GraduationCap className="w-5 h-5 text-white" />
           </div>
-          {!collapsed && <span className="font-heading font-bold text-sidebar-foreground text-lg">SmartCampus</span>}
+          {!collapsed && <span className="app-sidebar__brand-text">Smart<span>Campus</span></span>}
         </div>
 
-        <SidebarGroup>
-          <SidebarGroupLabel>Main</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {mainItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <NavLink to={item.url} end className="hover:bg-sidebar-accent/50" activeClassName="bg-sidebar-accent text-sidebar-primary font-medium">
-                      <item.icon className="mr-2 h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <div className="app-sidebar__section">
+          {!collapsed && <p className="app-sidebar__section-title">Main</p>}
+          <ul className="app-sidebar__menu">
+            {mainItems.map((item) => (
+              <li key={item.title}>
+                <NavLink
+                  to={item.url}
+                  onClick={onNavigate}
+                  className={`app-sidebar__link ${isActive(item.url) ? "app-sidebar__link--active" : ""}`}
+                >
+                  <item.icon size={16} />
+                  {!collapsed && <span>{item.title}</span>}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-        <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {accountItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <NavLink to={item.url} end className="hover:bg-sidebar-accent/50" activeClassName="bg-sidebar-accent text-sidebar-primary font-medium">
-                      <item.icon className="mr-2 h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
+        <div className="app-sidebar__section">
+          {!collapsed && <p className="app-sidebar__section-title">Account</p>}
+          <ul className="app-sidebar__menu">
+            {accountItems.map((item) => (
+              <li key={item.title}>
+                <NavLink
+                  to={item.url}
+                  onClick={onNavigate}
+                  className={`app-sidebar__link ${isActive(item.url) ? "app-sidebar__link--active" : ""}`}
+                >
+                  <item.icon size={16} />
+                  {!collapsed && <span>{item.title}</span>}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
 
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <NavLink to="/login" className="hover:bg-sidebar-accent/50 text-destructive">
-                <LogOut className="mr-2 h-4 w-4" />
-                {!collapsed && <span>Sign Out</span>}
-              </NavLink>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
+      <div className="app-sidebar__footer">
+        <button className="app-sidebar__link app-sidebar__signout" onClick={() => navigate("/")}>
+          <LogOut size={16} />
+          {!collapsed && <span>Sign Out</span>}
+        </button>
+      </div>
+    </aside>
   );
 }
