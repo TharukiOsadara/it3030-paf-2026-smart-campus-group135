@@ -1,4 +1,4 @@
-import { Building2, Calendar, Wrench, Bell, LayoutDashboard, User, LogOut, GraduationCap } from "lucide-react";
+import { Building2, Calendar, Wrench, Bell, LayoutDashboard, User, LogOut, GraduationCap, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 const mainItems = [
@@ -10,10 +10,12 @@ const mainItems = [
 ];
 
 const accountItems = [
+  { title: "My Tickets", url: "/dashboard/my-tickets", icon: Wrench },
+  { title: "Technician", url: "/dashboard/technician", icon: Wrench },
   { title: "Profile", url: "/dashboard/profile", icon: User },
 ];
 
-export function AppSidebar({ collapsed = false, onNavigate }) {
+export function AppSidebar({ collapsed = false, onNavigate, onToggle }) {
   const location = useLocation();
   const navigate = useNavigate();
   const isActive = (path) => location.pathname === path;
@@ -26,6 +28,9 @@ export function AppSidebar({ collapsed = false, onNavigate }) {
             <GraduationCap className="w-5 h-5 text-white" />
           </div>
           {!collapsed && <span className="app-sidebar__brand-text">Smart<span>Campus</span></span>}
+          <button type="button" className="app-sidebar__toggle" onClick={onToggle} aria-label="Toggle sidebar">
+            {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+          </button>
         </div>
 
         <div className="app-sidebar__section">
