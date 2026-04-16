@@ -29,10 +29,10 @@ public class User {
     @Column(nullable = false)
     private UserRole role; // USER, ADMIN, TECHNICIAN
 
-    @Column(nullable = false, updatable = false, columnDefinition = "DATETIME")
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false, columnDefinition = "DATETIME")
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     // OAuth2 fields
