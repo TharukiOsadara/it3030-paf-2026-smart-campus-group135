@@ -1,30 +1,17 @@
-import { useState, useEffect, useRef } from "react";
-import ThemeSwitcher from "./ThemeSwitcher";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 const NAV_LINKS = [
   { path: "/",          label: "Home" },
   { path: "/dashboard", label: "Dashboard" },
-  { path: "/tickets",   label: "My Tickets" },
   { path: "/about",     label: "About" },
-  { path: "/contact",   label: "Contact" },
+  { path: "/contact",   label: "Contact Us" },
 ];
 
 export default function Layout() {
   const location = useLocation();
-  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [notifOpen, setNotifOpen] = useState(false);
-  const notifRef = useRef(null);
-
-  // Mock notifications – replace with real data from API
-  const notifications = [
-    { id: 1, message: "Ticket #TK-005 status changed to IN_PROGRESS", time: "2m ago", unread: true },
-    { id: 2, message: "Your ticket #TK-003 has been RESOLVED",         time: "1h ago", unread: true },
-    { id: 3, message: "New comment added to ticket #TK-002",           time: "3h ago", unread: false },
-  ];
-  const unreadCount = notifications.filter(n => n.unread).length;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -35,16 +22,6 @@ export default function Layout() {
   useEffect(() => {
     setMenuOpen(false);
   }, [location.pathname]);
-
-  useEffect(() => {
-    const handleClick = (e) => {
-      if (notifRef.current && !notifRef.current.contains(e.target)) {
-        setNotifOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
 
   const isActive = (path) =>
     path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
@@ -90,51 +67,6 @@ export default function Layout() {
 
           {/* Right Actions */}
           <div className="navbar__actions">
-            <ThemeSwitcher />
-            <div className="notif-wrap" ref={notifRef}>
-              <button
-                className="navbar__icon-btn"
-                onClick={() => setNotifOpen(!notifOpen)}
-                aria-label="Notifications"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                </svg>
-                {unreadCount > 0 && (
-                  <span className="notif-badge">{unreadCount}</span>
-                )}
-              </button>
-
-              {notifOpen && (
-                <div className="notif-panel animate-scaleIn">
-                  <div className="notif-panel__header">
-                    <span>Notifications</span>
-                    <span className="notif-panel__count">{unreadCount} new</span>
-                  </div>
-                  <div className="notif-panel__list">
-                    {notifications.map(n => (
-                      <div key={n.id} className={`notif-item ${n.unread ? "notif-item--unread" : ""}`}>
-                        {n.unread && <span className="notif-item__dot" />}
-                        <div>
-                          <p className="notif-item__msg">{n.message}</p>
-                          <p className="notif-item__time">{n.time}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="notif-panel__footer">
-                    <button className="btn btn-ghost btn-sm" onClick={() => setNotifOpen(false)}>
-                      Mark all read
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-            <button className="btn btn-gradient btn-sm" onClick={() => navigate("/tickets/new")}>+ Report Issue</button>
-            <Link to="/login" className="navbar__avatar" title="My Account">
-              <span>U</span>
-            </Link>
             <button className="navbar__hamburger" onClick={() => setMenuOpen(!menuOpen)}>
               <span /><span /><span />
             </button>
@@ -152,9 +84,6 @@ export default function Layout() {
               {label}
             </Link>
           ))}
-          <button className="btn btn-gradient" onClick={() => navigate("/tickets/new")}>
-            + Report Issue
-          </button>
         </div>
       </nav>
 
