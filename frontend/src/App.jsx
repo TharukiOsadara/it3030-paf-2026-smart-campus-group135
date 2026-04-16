@@ -2,8 +2,16 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout.jsx";
+import DashboardLayout from "./components/DashboardLayout.jsx";
 import LoaderPage from "./components/Loader.jsx";
-import PlaceholderPage from "./pages/PlaceholderPage.jsx";
+import HomePage from "./pages/HomePage.jsx";
+import DashboardPage from "./pages/DashboardPage.jsx";
+import DashboardSectionPage from "./pages/DashboardSectionPage.jsx";
+import TicketListPage from "./pages/TicketListPage.jsx";
+import NewTicketPage from "./pages/NewTicketPage.jsx";
+import TicketDetailPage from "./pages/TicketDetailsPage.jsx";
+import AboutPage from "./pages/AboutPage.jsx";
+import ContactPage from "./pages/ContactPage.jsx";
 
 
 function App() {
@@ -20,62 +28,28 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <PlaceholderPage
-                title="Welcome"
-                description="Use the navigation menu to open Dashboard, Tickets, About, or Contact sections."
-              />
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <PlaceholderPage
-                title="Dashboard"
-                description="Dashboard widgets and analytics are loading in this workspace configuration."
-              />
-            }
-          />
-          <Route
-            path="/tickets"
-            element={
-              <PlaceholderPage
-                title="My Tickets"
-                description="Track your submitted incidents and monitor their progress here."
-              />
-            }
-          />
-          <Route
-            path="/tickets/new"
-            element={
-              <PlaceholderPage
-                title="Report Issue"
-                description="Submit a new incident ticket with priority, location, and details."
-              />
-            }
-          />
-          <Route
-            path="/about"
-            element={
-              <PlaceholderPage
-                title="About"
-                description="Project and platform overview for Smart Campus Operations Hub."
-              />
-            }
-          />
-          <Route
-            path="/contact"
-            element={
-              <PlaceholderPage
-                title="Contact"
-                description="Contact channels and support information will appear here."
-              />
-            }
-          />
+      <Routes>
+        <Route
+          path="/dashboard"
+          element={<DashboardLayout />}
+        >
+          <Route index element={<DashboardPage />} />
+          <Route path="facilities" element={<DashboardSectionPage title="Facilities" description="Manage campus facilities and resources." />} />
+          <Route path="bookings" element={<DashboardSectionPage title="Bookings" description="View and manage booking requests." />} />
+          <Route path="incidents" element={<TicketListPage />} />
+          <Route path="incidents/new" element={<NewTicketPage />} />
+          <Route path="incidents/:ticketId" element={<TicketDetailPage />} />
+          <Route path="notifications" element={<DashboardSectionPage title="Notifications" description="Review alerts and system updates." />} />
+          <Route path="profile" element={<DashboardSectionPage title="Profile" description="Update profile preferences and account details." />} />
+        </Route>
+
+        <Route element={<Layout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/tickets" element={<TicketListPage />} />
+          <Route path="/tickets/new" element={<NewTicketPage />} />
+          <Route path="/tickets/:id" element={<TicketDetailPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route
             path="/bookings"
             element={
@@ -85,10 +59,11 @@ function App() {
               />
             }
           />
-          <Route path="/login" element={<PlaceholderPage title="Login" />} />
+          <Route path="/login" element={<Navigate to="/" replace />} />
+          <Route path="/signup" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Layout>
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }
