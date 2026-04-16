@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import ThemeSwitcher from "./ThemeSwitcher";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import "../assets/css/Layout.css";
 
 const NAV_LINKS = [
@@ -11,7 +11,7 @@ const NAV_LINKS = [
   { path: "/contact",   label: "Contact" },
 ];
 
-export default function Layout({ children }) {
+export default function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
@@ -59,9 +59,16 @@ export default function Layout({ children }) {
           <Link to="/" className="navbar__logo">
             <span className="navbar__logo-icon">
               <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                <rect width="28" height="28" rx="8" fill="var(--color-primary)" fillOpacity="0.15"/>
-                <path d="M7 14L14 7L21 14L14 21L7 14Z" stroke="var(--color-primary)" strokeWidth="2" fill="none"/>
-                <circle cx="14" cy="14" r="3" fill="var(--color-accent)"/>
+                <rect width="28" height="28" rx="8" fill="url(#logoGradTop)" />
+                <path d="M14 8L6.2 11.8L14 15.6L21.8 11.8L14 8Z" stroke="white" strokeWidth="1.8" strokeLinejoin="round" />
+                <path d="M9.3 13.9V17C9.3 18 11.4 19.2 14 19.2C16.6 19.2 18.7 18 18.7 17V13.9" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M21.8 11.9V16.2" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+                <defs>
+                  <linearGradient id="logoGradTop" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#5A84F6" />
+                    <stop offset="1" stopColor="#9B75EE" />
+                  </linearGradient>
+                </defs>
               </svg>
             </span>
             <span className="navbar__logo-text">Smart<span className="navbar__logo-accent">Campus</span></span>
@@ -153,7 +160,7 @@ export default function Layout({ children }) {
       </nav>
 
       {/* ── MAIN CONTENT ── */}
-      <main className="layout__main">{children}</main>
+      <main className="layout__main"><Outlet /></main>
 
       {/* ── FOOTER ── */}
       <footer className="footer">
@@ -162,9 +169,16 @@ export default function Layout({ children }) {
             <Link to="/" className="navbar__logo">
               <span className="navbar__logo-icon">
                 <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
-                  <rect width="28" height="28" rx="8" fill="var(--color-primary)" fillOpacity="0.15"/>
-                  <path d="M7 14L14 7L21 14L14 21L7 14Z" stroke="var(--color-primary)" strokeWidth="2" fill="none"/>
-                  <circle cx="14" cy="14" r="3" fill="var(--color-accent)"/>
+                  <rect width="28" height="28" rx="8" fill="url(#logoGradBottom)" />
+                  <path d="M14 8L6.2 11.8L14 15.6L21.8 11.8L14 8Z" stroke="white" strokeWidth="1.8" strokeLinejoin="round" />
+                  <path d="M9.3 13.9V17C9.3 18 11.4 19.2 14 19.2C16.6 19.2 18.7 18 18.7 17V13.9" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M21.8 11.9V16.2" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+                  <defs>
+                    <linearGradient id="logoGradBottom" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#5A84F6" />
+                      <stop offset="1" stopColor="#9B75EE" />
+                    </linearGradient>
+                  </defs>
                 </svg>
               </span>
               <span className="navbar__logo-text">Smart<span className="navbar__logo-accent">Campus</span></span>
