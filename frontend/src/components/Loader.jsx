@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "../assets/css/Loader.css";
 
 /* ─────────────────────────────────────────
    PageShell – Full-screen animated loader
