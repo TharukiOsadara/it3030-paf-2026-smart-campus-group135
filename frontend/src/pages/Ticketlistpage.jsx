@@ -23,8 +23,10 @@ const formatDate = (value) => {
   });
 };
 
+const resolveTicketId = (ticket) => ticket?.id || ticket?._id || ticket?.ticketId || "";
+
 const mapTicket = (ticket) => ({
-  id: ticket.id,
+  id: resolveTicketId(ticket),
   title: ticket.title || "Untitled incident",
   category: toUiValue(ticket.category) || "General",
   priority: toUiValue(ticket.priority) || "Medium",
@@ -80,7 +82,8 @@ export default function TicketListPage() {
   const filteredTickets = useMemo(() => {
     const value = search.trim().toLowerCase();
     return tickets.filter((ticket) => {
-      const matchesSearch = !value || ticket.id.toLowerCase().includes(value) || ticket.title.toLowerCase().includes(value);
+      const idText = ticket.id ? ticket.id.toLowerCase() : "";
+      const matchesSearch = !value || idText.includes(value) || ticket.title.toLowerCase().includes(value);
       const matchesStatus = statusFilter === "All Status" || ticket.status === statusFilter;
       const matchesPriority = priorityFilter === "All Priority" || ticket.priority === priorityFilter;
       return matchesSearch && matchesStatus && matchesPriority;
@@ -159,13 +162,15 @@ export default function TicketListPage() {
           <article
             key={ticket.id}
             className="ticket-list-page__card"
-            onClick={() => navigate(`/dashboard/incidents/${ticket.id}`)}
+            onClick={() => ticket.id && navigate(`/dashboard/incidents/${ticket.id}`)}
             role="button"
             tabIndex={0}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
-                navigate(`/dashboard/incidents/${ticket.id}`);
+                if (ticket.id) {
+                  navigate(`/dashboard/incidents/${ticket.id}`);
+                }
               }
             }}
           >
