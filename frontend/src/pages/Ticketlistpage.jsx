@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Search, Filter, ChevronDown, AlertTriangle, Clock, CheckCircle2, ArrowRight } from "lucide-react";
 import { ticketService } from "../services/TicketServices";
@@ -10,6 +10,12 @@ const toUiValue = (value) => {
     .toLowerCase()
     .replace(/_/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+const normalizeStatus = (value) => {
+  const ui = toUiValue(value) || "Open";
+  if (ui === "Closed") return "Resolved";
+  return ui;
 };
 
 const formatDate = (value) => {
@@ -30,7 +36,7 @@ const mapTicket = (ticket) => ({
   title: ticket.title || "Untitled incident",
   category: toUiValue(ticket.category) || "General",
   priority: toUiValue(ticket.priority) || "Medium",
-  status: toUiValue(ticket.status) || "Open",
+  status: normalizeStatus(ticket.status),
   reporter: ticket.userId || "Unknown user",
   date: formatDate(ticket.createdAt || ticket.updatedAt),
   location: ticket.location || "Location not provided",
@@ -45,6 +51,8 @@ const iconByStatus = {
 
 export default function TicketListPage() {
   const navigate = useNavigate();
+  const statusSelectRef = useRef(null);
+  const prioritySelectRef = useRef(null);
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -88,7 +96,17 @@ export default function TicketListPage() {
       const matchesPriority = priorityFilter === "All Priority" || ticket.priority === priorityFilter;
       return matchesSearch && matchesStatus && matchesPriority;
     });
-  }, [search, statusFilter, priorityFilter]);
+  }, [search, statusFilter, priorityFilter, tickets]);
+
+  const openNativeSelect = (ref) => {
+    const element = ref?.current;
+    if (!element) return;
+    if (typeof element.showPicker === "function") {
+      element.showPicker();
+      return;
+    }
+    element.focus();
+  };
 
   return (
     <section className="ticket-list-page">
@@ -104,19 +122,67 @@ export default function TicketListPage() {
       </header>
 
       <div className="ticket-list-page__stats">
-        <article className="ticket-list-page__stat-card">
+        <article
+          className={`ticket-list-page__stat-card ${statusFilter === "All Status" ? "ticket-list-page__stat-card--active" : ""}`}
+          onClick={() => setStatusFilter("All Status")}
+          role="button"
+          tabIndex={0}
+          aria-pressed={statusFilter === "All Status"}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              setStatusFilter("All Status");
+            }
+          }}
+        >
           <h2>{stats.total}</h2>
           <p>Total Tickets</p>
         </article>
-        <article className="ticket-list-page__stat-card ticket-list-page__stat-card--open">
+        <article
+          className={`ticket-list-page__stat-card ticket-list-page__stat-card--open ${statusFilter === "Open" ? "ticket-list-page__stat-card--active" : ""}`}
+          onClick={() => setStatusFilter("Open")}
+          role="button"
+          tabIndex={0}
+          aria-pressed={statusFilter === "Open"}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              setStatusFilter("Open");
+            }
+          }}
+        >
           <h2>{stats.open}</h2>
           <p>Open</p>
         </article>
-        <article className="ticket-list-page__stat-card ticket-list-page__stat-card--progress">
+        <article
+          className={`ticket-list-page__stat-card ticket-list-page__stat-card--progress ${statusFilter === "In Progress" ? "ticket-list-page__stat-card--active" : ""}`}
+          onClick={() => setStatusFilter("In Progress")}
+          role="button"
+          tabIndex={0}
+          aria-pressed={statusFilter === "In Progress"}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              setStatusFilter("In Progress");
+            }
+          }}
+        >
           <h2>{stats.inProgress}</h2>
           <p>In Progress</p>
         </article>
-        <article className="ticket-list-page__stat-card ticket-list-page__stat-card--resolved">
+        <article
+          className={`ticket-list-page__stat-card ticket-list-page__stat-card--resolved ${statusFilter === "Resolved" ? "ticket-list-page__stat-card--active" : ""}`}
+          onClick={() => setStatusFilter("Resolved")}
+          role="button"
+          tabIndex={0}
+          aria-pressed={statusFilter === "Resolved"}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              setStatusFilter("Resolved");
+            }
+          }}
+        >
           <h2>{stats.resolved}</h2>
           <p>Resolved</p>
         </article>
@@ -133,9 +199,17 @@ export default function TicketListPage() {
           />
         </div>
 
-        <label className="ticket-list-page__select-wrap">
+        <label
+          className="ticket-list-page__select-wrap"
+          onMouseDown={(event) => {
+            if (event.target.tagName.toLowerCase() !== "select") {
+              event.preventDefault();
+              openNativeSelect(statusSelectRef);
+            }
+          }}
+        >
           <Filter size={16} />
-          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+          <select ref={statusSelectRef} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
             <option>All Status</option>
             <option>Open</option>
             <option>In Progress</option>
@@ -144,8 +218,16 @@ export default function TicketListPage() {
           <ChevronDown size={14} />
         </label>
 
-        <label className="ticket-list-page__select-wrap">
-          <select value={priorityFilter} onChange={(event) => setPriorityFilter(event.target.value)}>
+        <label
+          className="ticket-list-page__select-wrap"
+          onMouseDown={(event) => {
+            if (event.target.tagName.toLowerCase() !== "select") {
+              event.preventDefault();
+              openNativeSelect(prioritySelectRef);
+            }
+          }}
+        >
+          <select ref={prioritySelectRef} value={priorityFilter} onChange={(event) => setPriorityFilter(event.target.value)}>
             <option>All Priority</option>
             <option>High</option>
             <option>Medium</option>
