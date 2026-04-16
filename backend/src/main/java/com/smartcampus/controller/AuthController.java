@@ -1,10 +1,12 @@
 package com.smartcampus.controller;
 
 import com.smartcampus.dto.LoginDTO;
+import com.smartcampus.dto.LoginResponseDTO;
 import com.smartcampus.dto.RegisterDTO;
 import com.smartcampus.dto.UserDTO;
 import com.smartcampus.model.UserDocument;
 import com.smartcampus.repository.UserDocumentRepository;
+import com.smartcampus.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -35,13 +37,16 @@ public class AuthController {
     private final UserDocumentRepository userDocumentRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
     public AuthController(UserDocumentRepository userDocumentRepository,
                           PasswordEncoder passwordEncoder,
-                          AuthenticationManager authenticationManager) {
+                          AuthenticationManager authenticationManager,
+                          JwtUtil jwtUtil) {
         this.userDocumentRepository = userDocumentRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
     }
 
     /**
@@ -65,7 +70,7 @@ public class AuthController {
 
     /**
      * POST /api/auth/login — Login with email/password.
-     * Creates a session on success.
+     * Creates a session on success and returns JWT token.
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDTO dto, HttpServletRequest request) {
@@ -81,10 +86,22 @@ public class AuthController {
             HttpSession session = request.getSession(true);
             session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
 
-            // Return user info
+            // Get user info and generate token
             Optional<UserDocument> userOpt = userDocumentRepository.findByEmail(dto.getEmail());
             if (userOpt.isPresent()) {
-                return ResponseEntity.ok(UserDTO.fromDocument(userOpt.get()));
+                UserDocument user = userOpt.get();
+                String token = jwtUtil.generateToken(user.getId(), user.getEmail(), user.getName(), user.getRole().toString());
+                
+                LoginResponseDTO response = new LoginResponseDTO(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getRole().toString(),
+                        token,
+                        "Bearer",
+                        86400L  // 24 hours in seconds
+                );
+                return ResponseEntity.ok(response);
             }
 
             return ResponseEntity.ok(Map.of("message", "Login successful"));
