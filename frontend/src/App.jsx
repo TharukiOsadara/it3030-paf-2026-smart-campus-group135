@@ -10,6 +10,10 @@ import DashboardSectionPage from "./pages/DashboardSectionPage.jsx";
 import TicketListPage from "./pages/TicketListPage.jsx";
 import NewTicketPage from "./pages/NewTicketPage.jsx";
 import TicketDetailPage from "./pages/TicketDetailsPage.jsx";
+import UserTicketDashboardPage from "./pages/UserTicketDashboardPage.jsx";
+import UserTicketDetailsPage from "./pages/UserTicketDetailsPage.jsx";
+import TechnicianDashboardPage from "./pages/TechnicianDashboardPage.jsx";
+import TechnicianSolutionPage from "./pages/TechnicianSolutionPage.jsx";
 import AboutPage from "./pages/AboutPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
 
@@ -39,6 +43,10 @@ function App() {
           <Route path="incidents" element={<TicketListPage />} />
           <Route path="incidents/new" element={<NewTicketPage />} />
           <Route path="incidents/:ticketId" element={<TicketDetailPage />} />
+          <Route path="my-tickets" element={<UserTicketDashboardPage />} />
+          <Route path="my-tickets/:ticketId" element={<UserTicketDetailsPage />} />
+          <Route path="technician" element={<TechnicianDashboardPage />} />
+          <Route path="technician/:ticketId/solve" element={<TechnicianSolutionPage />} />
           <Route path="notifications" element={<DashboardSectionPage title="Notifications" description="Review alerts and system updates." />} />
           <Route path="profile" element={<DashboardSectionPage title="Profile" description="Update profile preferences and account details." />} />
         </Route>
