@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { HiOutlineXMark, HiOutlineUser, HiOutlineCog, HiOutlineArrowRightOnRectangle } from 'react-icons/hi2';
+import { HiOutlineXMark, HiOutlineUser, HiOutlineCog, HiOutlineArrowRightOnRectangle, HiOutlineCalendarDays } from 'react-icons/hi2';
 import { logout } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
 
@@ -64,6 +64,14 @@ export function AdminSidebar({ open, onClose }) {
             >
               <HiOutlineUser className="h-5 w-5" />
               <span>My Profile</span>
+            </NavLink>
+            <NavLink
+              to="/bookings/admin"
+              className={({ isActive }) => navLinkClass(isActive)}
+              onClick={onClose}
+            >
+              <HiOutlineCalendarDays className="h-5 w-5" />
+              <span>Booking Management</span>
             </NavLink>
           </div>
         </nav>
