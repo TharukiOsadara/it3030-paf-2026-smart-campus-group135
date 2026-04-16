@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Target, Users, Shield, Award, ArrowRight } from "lucide-react";
-import "./AboutPage.css";
 
 const team = [
   { name: "Prof. Amanda Silva", role: "Project Director", initials: "AS" },
