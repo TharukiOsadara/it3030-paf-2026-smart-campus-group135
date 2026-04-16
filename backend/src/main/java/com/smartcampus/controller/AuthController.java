@@ -246,7 +246,7 @@ public class AuthController {
 
         // Update password
         user.setPassword(passwordEncoder.encode(newPassword));
-        UserDocument updated = userDocumentRepository.save(user);
+        userDocumentRepository.save(user);
 
         return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
     }
