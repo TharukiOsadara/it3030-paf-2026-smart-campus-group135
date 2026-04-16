@@ -34,9 +34,9 @@ public class ResourceService {
      * Get resource by ID
      * Throws exception if not found
      */
-    public Resource getResourceById(Long id) {
+    public Resource getResourceById(String id) {
         return resourceRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(id));
+                .orElseThrow(() -> ResourceNotFoundException.notFoundById(id));
     }
 
     /**
@@ -85,7 +85,8 @@ public class ResourceService {
      * Find available resources by type and capacity
      */
     public List<Resource> findAvailableResources(String type, Integer capacity) {
-        return resourceRepository.findAvailableByTypeAndCapacity(type, capacity);
+        return resourceRepository.findByStatusAndTypeAndCapacityGreaterThanEqual(
+                Resource.ResourceStatus.ACTIVE, type, capacity);
     }
 
     /**
@@ -108,7 +109,7 @@ public class ResourceService {
      * Update existing resource
      * Throws exception if resource not found
      */
-    public Resource updateResource(Long id, Resource resourceDetails) {
+    public Resource updateResource(String id, Resource resourceDetails) {
         Resource existing = getResourceById(id);
         
         existing.setName(resourceDetails.getName());
@@ -119,6 +120,7 @@ public class ResourceService {
         existing.setStatus(resourceDetails.getStatus());
         existing.setAvailabilityStart(resourceDetails.getAvailabilityStart());
         existing.setAvailabilityEnd(resourceDetails.getAvailabilityEnd());
+        existing.setUpdatedAt(java.time.LocalDateTime.now());
         
         Resource updated = resourceRepository.save(existing);
         
@@ -139,7 +141,7 @@ public class ResourceService {
      * Delete resource
      * Throws exception if resource not found
      */
-    public void deleteResource(Long id) {
+    public void deleteResource(String id) {
         Resource existing = getResourceById(id);
         String name = existing.getName();
         resourceRepository.delete(existing);
