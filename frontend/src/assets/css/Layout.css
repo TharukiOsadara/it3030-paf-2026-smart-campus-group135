@@ -50,6 +50,13 @@
   color: var(--text-primary);
 }
 
+.navbar__logo-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+}
+
 .navbar__logo-text {
   font-family: var(--font-display);
   font-weight: 700;
@@ -58,7 +65,7 @@
 }
 
 .navbar__logo-accent {
-  color: var(--color-accent);
+  color: var(--color-primary-light);
 }
 
 .navbar__links {
