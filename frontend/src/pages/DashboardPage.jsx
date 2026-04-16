@@ -1,5 +1,3 @@
-import "./DashboardPage.css";
-
 const STATS = [
   { title: "Total Resources", value: "156", note: "+12 this month", type: "resources" },
   { title: "Active Bookings", value: "43", note: "8 pending approval", type: "bookings" },
