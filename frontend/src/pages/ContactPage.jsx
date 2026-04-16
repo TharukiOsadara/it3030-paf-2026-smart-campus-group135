@@ -1,5 +1,4 @@
 import { useState } from "react";
-import "./ContactPage.css";
 
 const CONTACT_CHANNELS = [
   { icon: "📧", label: "Email", value: "smartcampus@sliit.lk", sub: "Typical response within 24 hours" },
