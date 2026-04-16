@@ -4,6 +4,7 @@ import { ArrowLeft, AlertTriangle, Clock3, CheckCircle2, MapPin, User, Paperclip
 import { ticketService } from "../services/TicketServices";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+const TECH_ASSIGNMENTS_KEY = "sc_technician_assignments_v1";
 
 const statusIconMap = {
   Open: AlertTriangle,
@@ -27,6 +28,12 @@ const toUiValue = (value) => {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
+const normalizeStatus = (value) => {
+  const ui = toUiValue(value) || "Open";
+  if (ui === "Closed") return "Resolved";
+  return ui;
+};
+
 const formatDateTime = (value) => {
   if (!value) return "Unknown";
   const date = new Date(value);
@@ -43,6 +50,18 @@ const formatDateTime = (value) => {
 const getCurrentUserId = () => localStorage.getItem("sc_user_id") || localStorage.getItem("userId") || "demo-user";
 const getCurrentUserRole = () => (localStorage.getItem("sc_user_role") || localStorage.getItem("userRole") || "USER").toUpperCase();
 const resolveTicketId = (ticket) => ticket?.id || ticket?._id || ticket?.ticketId || "";
+
+const saveTechnicianAssignment = (technicianId, assignedTicketId) => {
+  if (!technicianId || !assignedTicketId) return;
+  try {
+    const raw = JSON.parse(localStorage.getItem(TECH_ASSIGNMENTS_KEY) || "{}");
+    const current = Array.isArray(raw[technicianId]) ? raw[technicianId] : [];
+    raw[technicianId] = Array.from(new Set([...current, assignedTicketId]));
+    localStorage.setItem(TECH_ASSIGNMENTS_KEY, JSON.stringify(raw));
+  } catch {
+    // Ignore storage access issues.
+  }
+};
 
 const mapTicket = (ticket) => {
   const created = formatDateTime(ticket.createdAt || ticket.updatedAt);
@@ -79,7 +98,7 @@ const mapTicket = (ticket) => {
   return {
     id: resolveTicketId(ticket),
     title: ticket.title || "Untitled incident",
-    status: toUiValue(ticket.status) || "Open",
+    status: normalizeStatus(ticket.status),
     priority: toUiValue(ticket.priority) || "Medium",
     category: toUiValue(ticket.category) || "General",
     location: ticket.location || "Location not provided",
@@ -165,6 +184,52 @@ export default function TicketDetailsPage() {
       setTicket(mapTicket(updated));
     } catch (error) {
       setLoadError(error.message || "Failed to delete comment");
+    } finally {
+      setActionBusy(false);
+    }
+  };
+
+  const assignTechnicianAndOpenDashboard = async () => {
+    if (!ticket || actionBusy || ticket.status === "Resolved") return;
+
+    const defaultTechnician = ticket.assignee || "technician-1";
+    const technicianId = (window.prompt("Enter technician user id", defaultTechnician) || "").trim();
+    if (!technicianId) return;
+
+    try {
+      setActionBusy(true);
+      const assigned = await ticketService.assignTechnician(ticket.id, technicianId);
+      const assignedTicket = mapTicket(assigned);
+
+      if (assignedTicket.status !== "In Progress") {
+        const progressed = await ticketService.updateStatus(ticket.id, {
+          status: "IN_PROGRESS",
+          resolutionNote: "Assigned to technician",
+        });
+        setTicket(mapTicket(progressed));
+      } else {
+        setTicket(assignedTicket);
+      }
+
+      saveTechnicianAssignment(technicianId, ticket.id);
+      navigate(`/dashboard/technician?ticketId=${ticket.id}`);
+    } catch (error) {
+      setLoadError(error.message || "Failed to assign technician");
+    } finally {
+      setActionBusy(false);
+    }
+  };
+
+  const deleteTicket = async () => {
+    if (!ticket || actionBusy) return;
+    if (!window.confirm("Delete this ticket permanently?")) return;
+
+    try {
+      setActionBusy(true);
+      await ticketService.deleteTicket(ticket.id);
+      navigate("/dashboard/incidents");
+    } catch (error) {
+      setLoadError(error.message || "Failed to delete ticket");
     } finally {
       setActionBusy(false);
     }
@@ -357,10 +422,11 @@ export default function TicketDetailsPage() {
           <article className="ticket-detail-page__panel">
             <h2>Actions</h2>
             <div className="ticket-detail-page__actions">
-              {ticket.status === "In Progress" ? <button className="ticket-detail-page__action ticket-detail-page__action--success" disabled={actionBusy} onClick={() => updateStatus("RESOLVED")}>Mark Resolved</button> : null}
-              <button className="ticket-detail-page__action" disabled={actionBusy} onClick={() => updateStatus("IN_PROGRESS")}>Escalate</button>
+              <button className="ticket-detail-page__action ticket-detail-page__action--primary" disabled={actionBusy || ticket.status === "Resolved"} onClick={assignTechnicianAndOpenDashboard}>Assign Technician</button>
+              <button className="ticket-detail-page__action ticket-detail-page__action--neutral" disabled={actionBusy || ticket.status === "Resolved"} onClick={() => updateStatus("IN_PROGRESS")}>Escalate</button>
               {getCurrentUserRole() === "ADMIN" ? <button className="ticket-detail-page__action" disabled={actionBusy} onClick={() => updateStatus("REJECTED")}>Reject Ticket</button> : null}
-              <button className="ticket-detail-page__action ticket-detail-page__action--danger" disabled={actionBusy} onClick={() => updateStatus("CLOSED")}>Close Ticket</button>
+              {getCurrentUserRole() === "ADMIN" ? <button className="ticket-detail-page__action ticket-detail-page__action--neutral" disabled={actionBusy} onClick={deleteTicket}>Delete Ticket</button> : null}
+              <button className="ticket-detail-page__action ticket-detail-page__action--danger" disabled={actionBusy || ticket.status === "Resolved"} onClick={() => updateStatus("RESOLVED")}>Close Ticket</button>
             </div>
             {loadError ? <p className="ticket-detail-page__empty">{loadError}</p> : null}
           </article>
