@@ -42,6 +42,7 @@ const formatDateTime = (value) => {
 
 const getCurrentUserId = () => localStorage.getItem("sc_user_id") || localStorage.getItem("userId") || "demo-user";
 const getCurrentUserRole = () => (localStorage.getItem("sc_user_role") || localStorage.getItem("userRole") || "USER").toUpperCase();
+const resolveTicketId = (ticket) => ticket?.id || ticket?._id || ticket?.ticketId || "";
 
 const mapTicket = (ticket) => {
   const created = formatDateTime(ticket.createdAt || ticket.updatedAt);
@@ -76,7 +77,7 @@ const mapTicket = (ticket) => {
   });
 
   return {
-    id: ticket.id,
+    id: resolveTicketId(ticket),
     title: ticket.title || "Untitled incident",
     status: toUiValue(ticket.status) || "Open",
     priority: toUiValue(ticket.priority) || "Medium",
