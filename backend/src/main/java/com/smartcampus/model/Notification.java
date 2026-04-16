@@ -32,7 +32,7 @@ public class Notification {
     @NotNull(message = "Notification type is required")
     private NotificationType type;
 
-    private boolean isRead = false;
+    private boolean read = false;
 
     private LocalDateTime createdAt;
 
