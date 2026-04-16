@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, AlertTriangle, Clock3, CheckCircle2, MapPin, User, Paperclip, MessageCircle, Send, Trash2, Download } from "lucide-react";
-import "./TicketDetailPage.css";
 import { ticketService } from "../services/TicketServices";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
