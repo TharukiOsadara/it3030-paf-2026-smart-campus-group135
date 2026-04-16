@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Upload } from "lucide-react";
-import "./NewTicketPage.css";
 import { ticketService } from "../services/TicketServices";
 
 const initialForm = {
