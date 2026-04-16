@@ -18,7 +18,7 @@ This system provides:
 - Spring Boot 3.2.4
 - Spring Security + OAuth2
 - Spring Data JPA
-- MySQL Database
+- H2 Database
 - Maven
 
 ### Frontend
@@ -38,7 +38,6 @@ This system provides:
 ### Prerequisites
 - JDK 17 or higher
 - Node.js 18+ and npm
-- MySQL 8.0+
 - Git
 - Maven 3.6+
 
@@ -59,18 +58,7 @@ chmod +x setup-project.sh
 
 ### Step 2: Configure Database
 
-1. Create MySQL database:
-```sql
-CREATE DATABASE smart_campus_db;
-```
-
-2. Update `backend/src/main/resources/application.yml`:
-```yaml
-spring:
-  datasource:
-    username: your_mysql_username
-    password: your_mysql_password
-```
+No manual database setup is required. The backend uses a local H2 database file for development and an in-memory H2 database for tests.
 
 ### Step 3: Configure OAuth 2.0
 
@@ -79,17 +67,7 @@ spring:
 3. Enable Google+ API
 4. Create OAuth 2.0 credentials
 5. Add authorized redirect URI: `http://localhost:8080/api/login/oauth2/code/google`
-6. Update `application.yml`:
-```yaml
-spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: YOUR_CLIENT_ID
-            client-secret: YOUR_CLIENT_SECRET
-```
+6. Update the Google OAuth2 values in `backend/.env` or `backend/.env.example`.
 
 ### Step 4: Configure JWT Secret
 
@@ -102,12 +80,7 @@ openssl rand -base64 64
 [Convert]::ToBase64String((1..64 | ForEach-Object { Get-Random -Maximum 256 }))
 ```
 
-Add to `application.yml`:
-```yaml
-app:
-  jwt:
-    secret: YOUR_GENERATED_SECRET
-```
+Add the secret to `backend/.env` as `JWT_SECRET=YOUR_GENERATED_SECRET`.
 
 ### Step 5: Install and Run Backend
 
