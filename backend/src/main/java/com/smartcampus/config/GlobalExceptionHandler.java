@@ -8,6 +8,8 @@ import com.smartcampus.exception.InvalidTicketTransitionException;
 import com.smartcampus.exception.ResourceNotFoundException;
 import com.smartcampus.exception.TicketNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -23,6 +25,8 @@ import org.springframework.web.servlet.NoHandlerFoundException;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
@@ -65,7 +69,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, HttpServletRequest request) {
-        return build(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", ex.getClass().getSimpleName(), request.getRequestURI());
+        log.error("Unhandled exception for {}", request.getRequestURI(), ex);
+        String message = ex.getClass().getSimpleName().contains("Mongo") && ex.getMessage() != null
+                ? ex.getMessage()
+                : "An unexpected error occurred";
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, message, ex.getClass().getSimpleName(), request.getRequestURI());
     }
 
     private ResponseEntity<ErrorResponse> build(HttpStatus status, String message, String error, String path) {
