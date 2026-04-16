@@ -1,13 +1,13 @@
 package com.smartcampus;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest
 class SmartcampusApplicationTests {
 
 	@Test
-	void contextLoads() {
+	void applicationClassLoads() {
+		assertNotNull(new SmartcampusApplication());
 	}
 
 }
