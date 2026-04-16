@@ -1,6 +1,5 @@
 import { Building2, Calendar, Wrench, Bell, LayoutDashboard, User, LogOut, GraduationCap } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import "../assets/css/AppSidebar.css";
 
 const mainItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
