@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Search, Filter, ChevronDown, AlertTriangle, Clock, CheckCircle2, ArrowRight } from "lucide-react";
-import "./TicketList.css";
 import { ticketService } from "../services/TicketServices";
 
 const toUiValue = (value) => {
