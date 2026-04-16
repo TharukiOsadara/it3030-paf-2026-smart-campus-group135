@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import ThemeSwitcher from "./ThemeSwitcher";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import "../assets/css/Layout.css";
 
 const NAV_LINKS = [
   { path: "/",          label: "Home" },
