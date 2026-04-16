@@ -13,7 +13,10 @@ public class ResourceNotFoundException extends RuntimeException {
         super(message, cause);
     }
 
-    public ResourceNotFoundException(Long id) {
-        super("Resource not found with id: " + id);
+    /**
+     * Factory method for resource not found by ID
+     */
+    public static ResourceNotFoundException notFoundById(String id) {
+        return new ResourceNotFoundException("Resource not found with id: " + id);
     }
 }
