@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Document(collection = "tickets")
 @Data
@@ -48,9 +50,19 @@ public class Ticket {
 
     private LocalDateTime closedAt;
 
+    private String rejectionReason;
+
+    private LocalDateTime firstResponseAt;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    private List<Attachment> attachments = new ArrayList<>();
+
+    private List<Comment> comments = new ArrayList<>();
+
+    private List<Activity> activities = new ArrayList<>();
 
     public enum Priority {
         LOW,
@@ -65,5 +77,49 @@ public class Ticket {
         RESOLVED,
         CLOSED,
         REJECTED
+    }
+
+    public enum UserRole {
+        USER,
+        STAFF,
+        TECHNICIAN,
+        ADMIN
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Attachment {
+        private String id;
+        private String originalFileName;
+        private String storedFileName;
+        private String contentType;
+        private long sizeBytes;
+        private String uploadedBy;
+        private LocalDateTime uploadedAt;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Comment {
+        private String id;
+        private String userId;
+        private UserRole userRole;
+        private String content;
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Activity {
+        private String id;
+        private String type;
+        private String actorId;
+        private UserRole actorRole;
+        private String content;
+        private LocalDateTime createdAt;
     }
 }
