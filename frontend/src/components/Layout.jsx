@@ -37,7 +37,7 @@ export default function Layout({ children }) {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <Link
             to="/"
-            className="flex shrink-0 items-center gap-3 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B82F6]"
+            className="flex shrink-0 items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B82F6]"
             onClick={closeMobile}
           >
             <span
@@ -76,6 +76,14 @@ export default function Layout({ children }) {
                 className={({ isActive }) => navLinkClass(isActive)}
               >
                 Profile
+              </NavLink>
+            )}
+            {user && (
+              <NavLink
+                to="/bookings/my"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                Bookings
               </NavLink>
             )}
             {user?.role === 'ADMIN' && (
@@ -153,6 +161,11 @@ export default function Layout({ children }) {
               {user && (
                 <NavLink to="/profile" onClick={closeMobile} className={({ isActive }) => navLinkClass(isActive)}>
                   Profile
+                </NavLink>
+              )}
+              {user && (
+                <NavLink to="/bookings/my" onClick={closeMobile} className={({ isActive }) => navLinkClass(isActive)}>
+                  Bookings
                 </NavLink>
               )}
               {user?.role === 'ADMIN' && (

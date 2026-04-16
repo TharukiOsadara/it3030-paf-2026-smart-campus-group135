@@ -17,6 +17,9 @@ import PlaceholderPage from './pages/PlaceholderPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import SignupPage from './pages/SignupPage.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
+import BookingForm from './pages/booking/BookingForm.jsx';
+import MyBookings from './pages/booking/MyBookings.jsx';
+import AdminBookings from './pages/booking/AdminBookings.jsx';
 
 function App() {
   return (
@@ -37,6 +40,14 @@ function App() {
             element={
               <AdminLayout>
                 <AdminProfile />
+              </AdminLayout>
+            }
+          />
+          <Route
+            path="/bookings/admin"
+            element={
+              <AdminLayout>
+                <AdminBookings />
               </AdminLayout>
             }
           />
@@ -99,10 +110,15 @@ function App() {
                     path="/bookings"
                     element={
                       <PageShell>
-                        <PlaceholderPage
-                          title="Bookings"
-                          description="Booking management and approval workflows will appear here."
-                        />
+                        <BookingForm />
+                      </PageShell>
+                    }
+                  />
+                  <Route
+                    path="/bookings/my"
+                    element={
+                      <PageShell>
+                        <MyBookings />
                       </PageShell>
                     }
                   />
