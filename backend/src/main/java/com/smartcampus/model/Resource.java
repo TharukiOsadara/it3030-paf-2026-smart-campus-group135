@@ -1,71 +1,73 @@
 package com.smartcampus.model;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@Entity
-@Table(name = "resources")
+/**
+ * MongoDB Document for Resource management
+ * Represents facilities and assets in the Smart Campus system
+ */
+@Document(collection = "resources")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Resource {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;  // MongoDB ObjectId as String
 
     @NotBlank(message = "Resource name is required")
-    @Column(nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
     private String description;
 
     @NotBlank(message = "Resource type is required")
-    @Column(nullable = false)
     private String type; // e.g., LECTURE_HALL, LAB, MEETING_ROOM, EQUIPMENT
 
     @NotBlank(message = "Resource location is required")
-    @Column(nullable = false)
     private String location;
 
     @PositiveOrZero(message = "Capacity must be zero or positive")
     private Integer capacity;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private ResourceStatus status; // ACTIVE, OUT_OF_SERVICE
 
-    @Column(name = "availability_start", columnDefinition = "TIME")
     private LocalTime availabilityStart;
 
-    @Column(name = "availability_end", columnDefinition = "TIME")
     private LocalTime availabilityEnd;
 
-    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "DATETIME")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", columnDefinition = "DATETIME")
     private LocalDateTime updatedAt;
 
-    @Column(name = "created_by")
-    private Long createdBy;
+    private String createdBy;  // User ID (String for MongoDB)
 
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
+    /**
+     * Constructor for creating new resources
+     */
+    public static Resource create(String name, String description, String type, 
+                                   String location, Integer capacity, 
+                                   ResourceStatus status, LocalTime start, LocalTime end) {
+        Resource resource = new Resource();
+        resource.setName(name);
+        resource.setDescription(description);
+        resource.setType(type);
+        resource.setLocation(location);
+        resource.setCapacity(capacity);
+        resource.setStatus(status);
+        resource.setAvailabilityStart(start);
+        resource.setAvailabilityEnd(end);
+        resource.setCreatedAt(LocalDateTime.now());
+        resource.setUpdatedAt(LocalDateTime.now());
+        return resource;
     }
 
     public enum ResourceStatus {
