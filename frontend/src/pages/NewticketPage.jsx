@@ -13,6 +13,9 @@ const initialForm = {
   phone: "",
 };
 
+const resolveTicketId = (ticket) => ticket?.id || ticket?._id || ticket?.ticketId || "";
+const normalizePhoneDigits = (value) => value.replace(/\D/g, "").slice(0, 10);
+
 export default function NewTicketPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState(initialForm);
@@ -32,6 +35,10 @@ export default function NewTicketPage() {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setError("");
+    if (name === "phone") {
+      setFormData((current) => ({ ...current, phone: normalizePhoneDigits(value) }));
+      return;
+    }
     setFormData((current) => ({ ...current, [name]: value }));
   };
 
@@ -52,11 +59,24 @@ export default function NewTicketPage() {
       return;
     }
 
+    const email = formData.email.trim();
+    const phoneDigits = normalizePhoneDigits(formData.phone);
+
+    if (email && !email.includes("@")) {
+      setError("Please enter a valid email address with '@'.");
+      return;
+    }
+
+    if (phoneDigits && phoneDigits.length !== 10) {
+      setError("Phone number must be exactly 10 digits.");
+      return;
+    }
+
     try {
       setSubmitting(true);
       setError("");
 
-      const contactDetails = [formData.email?.trim(), formData.phone?.trim()].filter(Boolean).join(" | ");
+      const contactDetails = [email, phoneDigits].filter(Boolean).join(" | ");
 
       const created = await ticketService.createTicket({
         title: formData.title.trim(),
@@ -72,11 +92,18 @@ export default function NewTicketPage() {
         resolutionNotes: null,
       });
 
+      const createdTicketId = resolveTicketId(created);
+
       for (const file of files) {
-        await ticketService.addAttachment(created.id, file);
+        if (!createdTicketId) break;
+        try {
+          await ticketService.addAttachment(createdTicketId, file);
+        } catch {
+          // Keep navigation flow smooth even if one attachment fails.
+        }
       }
 
-      navigate("/dashboard/incidents");
+      navigate("/dashboard/my-tickets");
     } catch (submitError) {
       setError(submitError.message || "Failed to create ticket");
     } finally {
@@ -171,7 +198,15 @@ export default function NewTicketPage() {
 
             <label>
               Phone
-              <input name="phone" value={formData.phone} onChange={handleChange} placeholder="+94 7X XXX XXXX" />
+              <input
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="0712345678"
+                inputMode="numeric"
+                maxLength={10}
+                pattern="[0-9]{10}"
+              />
             </label>
           </div>
         </section>
