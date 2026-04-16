@@ -32,45 +32,24 @@ export default function LoaderPage({ loading = true, message = "Loading..." }) {
 
   return (
     <div className="page-shell">
-      {/* Background orbs */}
       <div className="shell-orb shell-orb--1" />
       <div className="shell-orb shell-orb--2" />
       <div className="shell-orb shell-orb--3" />
 
-      {/* Grid overlay */}
-      <div className="shell-grid" />
-
-      {/* Content */}
       <div className="shell-content">
-        {/* Logo animation */}
-        <div className="shell-logo">
-          <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
-            <rect width="72" height="72" rx="20" fill="rgba(10,132,255,0.1)" className="shell-logo__bg"/>
-            <path
-              d="M18 36L36 18L54 36L36 54L18 36Z"
-              stroke="var(--color-primary)"
-              strokeWidth="2.5"
-              fill="none"
-              strokeDasharray="120"
-              strokeDashoffset="120"
-              className="shell-logo__path"
-            />
-            <circle cx="36" cy="36" r="8" fill="none" stroke="var(--color-accent)" strokeWidth="2.5"
-              strokeDasharray="50" strokeDashoffset="50"
-              className="shell-logo__circle"
-            />
-            <circle cx="36" cy="36" r="3" fill="var(--color-accent)" className="shell-logo__dot"/>
+        <div className="shell-logo-tile">
+          <svg width="56" height="56" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+            <path d="M14 8L6.2 11.8L14 15.6L21.8 11.8L14 8Z" stroke="white" strokeWidth="1.9" strokeLinejoin="round" />
+            <path d="M9.3 13.9V17C9.3 18 11.4 19.2 14 19.2C16.6 19.2 18.7 18 18.7 17V13.9" stroke="white" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M21.8 11.9V16.2" stroke="white" strokeWidth="1.9" strokeLinecap="round" />
           </svg>
         </div>
 
-        {/* Brand name */}
         <div className="shell-brand">
-          <span className="shell-brand__main">Smart</span>
-          <span className="shell-brand__accent">Campus</span>
+          <span className="shell-brand__main">Smart</span><span className="shell-brand__accent">Campus</span>
         </div>
-        <p className="shell-brand__sub">Operations Hub</p>
+        <p className="shell-brand__sub">{message || "Loading your campus hub..."}</p>
 
-        {/* Progress bar */}
         <div className="shell-progress">
           <div className="shell-progress__track">
             <div
@@ -85,25 +64,17 @@ export default function LoaderPage({ loading = true, message = "Loading..." }) {
           <span className="shell-progress__pct">{Math.round(progress)}%</span>
         </div>
 
-        {/* Status message */}
         <p className="shell-status">
           <span className="shell-status__dot" />
           {message || phases[Math.min(phase, phases.length - 1)]}
         </p>
 
-        {/* Scanning dots */}
         <div className="shell-dots">
           {[0,1,2,3,4].map(i => (
             <span key={i} className="shell-dot" style={{ animationDelay: `${i * 0.15}s` }} />
           ))}
         </div>
       </div>
-
-      {/* Corner decorations */}
-      <div className="shell-corner shell-corner--tl" />
-      <div className="shell-corner shell-corner--tr" />
-      <div className="shell-corner shell-corner--bl" />
-      <div className="shell-corner shell-corner--br" />
     </div>
   );
 }
