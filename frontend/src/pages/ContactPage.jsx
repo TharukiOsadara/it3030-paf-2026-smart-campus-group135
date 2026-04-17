@@ -1,6 +1,12 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { HiOutlineClock, HiOutlineEnvelope, HiOutlineMapPin } from 'react-icons/hi2'
+import {
+  isNameValid,
+  isRestrictedEmailValid,
+  sanitizeEmailInput,
+  sanitizeNameInput,
+} from '../utils/formValidation'
 
 const CONTACT_EMAIL = 'operations@smartcampus.edu.lk'
 
@@ -15,9 +21,22 @@ export default function ContactPage() {
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
   const [sent, setSent] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
+
+    if (!isNameValid(name)) {
+      setError('Name can only contain letters and spaces')
+      return
+    }
+
+    if (!isRestrictedEmailValid(email)) {
+      setError('Email can only contain letters, numbers, @ and .')
+      return
+    }
+
+    setError('')
     const body = `Name: ${name}\nEmail: ${email}\n\n${message}`
     const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`[Smart Campus] ${subject}`)}&body=${encodeURIComponent(body)}`
     window.location.href = mailto
@@ -73,6 +92,12 @@ export default function ContactPage() {
               </p>
             )}
 
+            {error && (
+              <p className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400" role="alert">
+                {error}
+              </p>
+            )}
+
             <form onSubmit={handleSubmit} className="mt-8 space-y-5">
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
@@ -86,7 +111,10 @@ export default function ContactPage() {
                     autoComplete="name"
                     required
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                      setName(sanitizeNameInput(e.target.value))
+                      if (error) setError('')
+                    }}
                     className={inputClass}
                     placeholder="Your name"
                   />
@@ -102,7 +130,10 @@ export default function ContactPage() {
                     autoComplete="email"
                     required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(sanitizeEmailInput(e.target.value))
+                      if (error) setError('')
+                    }}
                     className={inputClass}
                     placeholder="you@university.edu"
                   />
@@ -141,7 +172,7 @@ export default function ContactPage() {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <button
                   type="submit"
-                  className="inline-flex min-h-[3rem] items-center justify-center rounded-xl bg-[#3B82F6] px-8 text-base font-semibold text-white shadow-[0_0_28px_rgba(59,130,246,0.45)] transition-all hover:bg-blue-500 hover:shadow-[0_0_36px_rgba(59,130,246,0.55)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
+                  className="inline-flex min-h-[3rem] items-center justify-center rounded-xl bg-[#3B82F6] px-8 text-base font-semibold text-white shadow-[0_0_28px_rgba(59,130,246,0.45)] transition-all hover:bg-blue-500 hover:shadow-[0_0_36px_rgba(59,130,246,0.55)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
                 >
                   Send via email
                 </button>

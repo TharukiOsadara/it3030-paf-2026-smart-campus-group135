@@ -238,10 +238,10 @@ export default function HomePage() {
             Join hundreds of staff and students already using Smart Campus for their daily operations
           </p>
           <Link
-            to="/sign-in"
+            to="/signup"
             className="mt-10 inline-flex min-h-[3rem] items-center justify-center rounded-xl bg-[#3B82F6] px-8 text-base font-semibold text-white shadow-[0_0_28px_rgba(59,130,246,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-[0_0_36px_rgba(59,130,246,0.55)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B82F6]"
           >
-            Sign up with Google
+            Get started free
           </Link>
         </div>
       </section>
