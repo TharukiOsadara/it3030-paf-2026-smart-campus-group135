@@ -74,7 +74,7 @@ export default function HomePage() {
           </p>
 
           <div className="home-hero__actions">
-            <button className="btn btn-gradient btn-lg" onClick={() => navigate("/dashboard")}>Start Now</button>
+            <button className="btn btn-gradient btn-lg" onClick={() => navigate("/signup")}>Start Now</button>
             <button className="btn btn-secondary btn-lg" onClick={() => navigate("/about")}>Learn More</button>
           </div>
 
@@ -110,7 +110,7 @@ export default function HomePage() {
         <div className="home-cta__inner">
           <h2>Ready to modernize your campus?</h2>
           <p>Join hundreds of universities already using SmartCampus to streamline operations.</p>
-          <button className="btn btn-gradient btn-lg" onClick={() => navigate("/dashboard")}>Get Started Free</button>
+          <button className="btn btn-gradient btn-lg" onClick={() => navigate("/signup")}>Get Started Free</button>
         </div>
       </section>
     </div>
