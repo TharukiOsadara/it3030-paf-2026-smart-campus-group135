@@ -1,170 +1,148 @@
-import React, { useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { HiMenuAlt3, HiX } from 'react-icons/hi';
-import NotificationPanel from './NotificationPanel';
-import { useAuth } from '../context/AuthContext';
-import { logout } from '../services/authService';
+import { useState, useEffect } from "react";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
-const navLinkBase =
-  'rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B82F6]';
+const NAV_LINKS = [
+  { path: "/",          label: "Home" },
+  { path: "/dashboard", label: "Dashboard" },
+  { path: "/about",     label: "About" },
+  { path: "/contact",   label: "Contact Us" },
+];
 
-function navLinkClass(isActive) {
-  return isActive
-    ? `${navLinkBase} bg-[#1F2937] font-semibold text-white`
-    : `${navLinkBase} text-[#9CA3AF] hover:bg-white/5 hover:text-white`;
-}
+export default function Layout() {
+  const location = useLocation();
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-export default function Layout({ children }) {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const { user, setUser, loading } = useAuth();
-  const navigate = useNavigate();
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-  const closeMobile = () => setMobileOpen(false);
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch {
-      // ignore
-    }
-    setUser(null);
-    navigate('/login');
-  };
+  const isActive = (path) =>
+    path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#020617] font-sans antialiased">
-      <header className="sticky top-0 z-50 border-b border-[#1F2937] bg-[#020617]/95 shadow-lg shadow-black/40 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          <Link
-            to="/"
-            className="flex shrink-0 items-center gap-3 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B82F6]"
-            onClick={closeMobile}
-          >
-            <span
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#3B82F6] text-sm font-bold tracking-tight text-white shadow-[0_0_22px_rgba(59,130,246,0.55)]"
-              aria-hidden
-            >
-              SC
+    <div className="layout">
+      {/* ── NAVBAR ── */}
+      <nav className={`navbar ${scrolled ? "navbar--scrolled" : ""}`}>
+        <div className="navbar__inner">
+          {/* Logo */}
+          <Link to="/" className="navbar__logo">
+            <span className="navbar__logo-icon">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <rect width="28" height="28" rx="8" fill="url(#logoGradTop)" />
+                <path d="M14 8L6.2 11.8L14 15.6L21.8 11.8L14 8Z" stroke="white" strokeWidth="1.8" strokeLinejoin="round" />
+                <path d="M9.3 13.9V17C9.3 18 11.4 19.2 14 19.2C16.6 19.2 18.7 18 18.7 17V13.9" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M21.8 11.9V16.2" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+                <defs>
+                  <linearGradient id="logoGradTop" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#5A84F6" />
+                    <stop offset="1" stopColor="#9B75EE" />
+                  </linearGradient>
+                </defs>
+              </svg>
             </span>
-            <span className="text-lg font-bold tracking-tight text-[#3B82F6]">
-              Smart Campus
-            </span>
+            <span className="navbar__logo-text">Smart<span className="navbar__logo-accent">Campus</span></span>
           </Link>
 
-          <nav
-            className="hidden items-center gap-0.5 md:flex"
-            aria-label="Main navigation"
-          >
-            <NavLink to="/" end className={({ isActive }) => navLinkClass(isActive)}>
-              Home
-            </NavLink>
-            <NavLink
-              to="/about"
-              className={({ isActive }) => navLinkClass(isActive)}
-            >
-              About us
-            </NavLink>
-            <NavLink
-              to="/contact"
-              className={({ isActive }) => navLinkClass(isActive)}
-            >
-              Contact
-            </NavLink>
-            {user && (
-              <NavLink
-                to="/profile"
-                className={({ isActive }) => navLinkClass(isActive)}
-              >
-                Profile
-              </NavLink>
-            )}
-            {user?.role === 'ADMIN' && (
-              <NavLink
-                to="/admin/users"
-                className={({ isActive }) => navLinkClass(isActive)}
-              >
-                Admin
-              </NavLink>
-            )}
-            {/* Add more links as needed */}
-          </nav>
+          {/* Desktop Links */}
+          <ul className="navbar__links">
+            {NAV_LINKS.map(({ path, label }) => (
+              <li key={path}>
+                <Link
+                  to={path}
+                  className={`navbar__link ${isActive(path) ? "navbar__link--active" : ""}`}
+                >
+                  {label}
+                  {isActive(path) && <span className="navbar__link-dot" />}
+                </Link>
+              </li>
+            ))}
+          </ul>
 
-          <div className="flex items-center gap-2">
-            {/* Notification bell — only shown when logged in */}
-            <NotificationPanel />
-
-            {/* Auth buttons */}
-            {!loading && (
-              <>
-                {user ? (
-                  <div className="flex items-center gap-3">
-                    <div className="hidden items-center gap-2 md:flex">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#3B82F6]/20 text-xs font-semibold text-[#3B82F6]">
-                        {user.name?.charAt(0)?.toUpperCase() || '?'}
-                      </div>
-                      <span className="max-w-[120px] truncate text-sm font-medium text-[#CBD5E1]">
-                        {user.name}
-                      </span>
-                    </div>
-                    <button
-                      id="logout-btn"
-                      onClick={handleLogout}
-                      className="rounded-lg border border-[#334155] bg-white/[0.03] px-3 py-1.5 text-sm font-medium text-[#94A3B8] transition-colors hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-400"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                ) : (
-                  <Link
-                    id="login-btn"
-                    to="/login"
-                    className="rounded-lg bg-[#3B82F6] px-4 py-1.5 text-sm font-semibold text-white shadow-[0_0_16px_rgba(59,130,246,0.35)] transition-all hover:-translate-y-0.5 hover:bg-blue-500 hover:shadow-[0_0_24px_rgba(59,130,246,0.45)]"
-                  >
-                    Sign in
-                  </Link>
-                )}
-              </>
-            )}
-
-            {/* Mobile menu toggle */}
-            <button
-              className="rounded-lg p-2 text-[#9CA3AF] hover:bg-white/5 hover:text-white md:hidden"
-              onClick={() => setMobileOpen((o) => !o)}
-              aria-label="Toggle menu"
-            >
-              {mobileOpen ? <HiX className="h-6 w-6" /> : <HiMenuAlt3 className="h-6 w-6" />}
+          {/* Right Actions */}
+          <div className="navbar__actions">
+            <button className="navbar__hamburger" onClick={() => setMenuOpen(!menuOpen)}>
+              <span /><span /><span />
             </button>
           </div>
         </div>
 
-        {/* Mobile nav */}
-        {mobileOpen && (
-          <nav className="border-t border-[#1F2937] bg-[#020617] px-4 py-4 md:hidden">
-            <div className="flex flex-col gap-1">
-              <NavLink to="/" end onClick={closeMobile} className={({ isActive }) => navLinkClass(isActive)}>
-                Home
-              </NavLink>
-              <NavLink to="/about" onClick={closeMobile} className={({ isActive }) => navLinkClass(isActive)}>
-                About us
-              </NavLink>
-              <NavLink to="/contact" onClick={closeMobile} className={({ isActive }) => navLinkClass(isActive)}>
-                Contact
-              </NavLink>
-              {user && (
-                <NavLink to="/profile" onClick={closeMobile} className={({ isActive }) => navLinkClass(isActive)}>
-                  Profile
-                </NavLink>
-              )}
-              {user?.role === 'ADMIN' && (
-                <NavLink to="/admin/users" onClick={closeMobile} className={({ isActive }) => navLinkClass(isActive)}>
-                  Admin
-                </NavLink>
-              )}
+        {/* Mobile Menu */}
+        <div className={`navbar__mobile ${menuOpen ? "navbar__mobile--open" : ""}`}>
+          {NAV_LINKS.map(({ path, label }) => (
+            <Link
+              key={path}
+              to={path}
+              className={`navbar__mobile-link ${isActive(path) ? "navbar__mobile-link--active" : ""}`}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+      </nav>
+
+      {/* ── MAIN CONTENT ── */}
+      <main className="layout__main"><Outlet /></main>
+
+      {/* ── FOOTER ── */}
+      <footer className="footer">
+        <div className="footer__inner">
+          <div className="footer__brand">
+            <Link to="/" className="navbar__logo">
+              <span className="navbar__logo-icon">
+                <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+                  <rect width="28" height="28" rx="8" fill="url(#logoGradBottom)" />
+                  <path d="M14 8L6.2 11.8L14 15.6L21.8 11.8L14 8Z" stroke="white" strokeWidth="1.8" strokeLinejoin="round" />
+                  <path d="M9.3 13.9V17C9.3 18 11.4 19.2 14 19.2C16.6 19.2 18.7 18 18.7 17V13.9" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M21.8 11.9V16.2" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+                  <defs>
+                    <linearGradient id="logoGradBottom" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#5A84F6" />
+                      <stop offset="1" stopColor="#9B75EE" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </span>
+              <span className="navbar__logo-text">Smart<span className="navbar__logo-accent">Campus</span></span>
+            </Link>
+            <p className="footer__tagline">Modernizing university operations, one workflow at a time.</p>
+          </div>
+
+          <div className="footer__links">
+            <div className="footer__col">
+              <h4>Platform</h4>
+              <Link to="/dashboard">Dashboard</Link>
+              <Link to="/tickets">Tickets</Link>
+              <Link to="/tickets/new">Report Issue</Link>
             </div>
-          </nav>
-        )}
-      </header>
-      <main className="flex-1">{children}</main>
+            <div className="footer__col">
+              <h4>Company</h4>
+              <Link to="/about">About Us</Link>
+              <Link to="/contact">Contact</Link>
+            </div>
+            <div className="footer__col">
+              <h4>Stack</h4>
+              <a href="#" target="_blank" rel="noopener">Spring Boot</a>
+              <a href="#" target="_blank" rel="noopener">React + Vite</a>
+              <a href="#" target="_blank" rel="noopener">MongoDB</a>
+            </div>
+          </div>
+        </div>
+
+        <div className="footer__bottom">
+          <p>© 2026 Smart Campus Operations Hub · IT3030 – PAF · SLIIT</p>
+          <div className="footer__bottom-links">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -15,23 +15,131 @@ This system provides:
 
 ### Backend
 - Java 17
-- Spring Boot 3.2.4
-- Spring Security + OAuth2
-- Spring Data JPA
-- MySQL Database
+- Spring Boot 4.0.5
+- Spring Security
+- Spring Data MongoDB
+- MongoDB Database
 - Maven
 
 ### Frontend
 - React 18+
 - React Router
-- Axios
-- TailwindCSS / Material-UI (to be decided)
-- Vite (or Create React App)
+- Fetch API service layer
+- Custom CSS + Vite
 
 ### DevOps
 - GitHub Actions (CI/CD)
 - JUnit & Mockito (Backend Testing)
 - Jest & React Testing Library (Frontend Testing)
+
+## Module C Requirements Coverage (Implemented)
+
+### Functional Requirements
+
+Backend API:
+- Create incident ticket with category, description, priority, location/resource and preferred contact details.
+- Upload image attachments to tickets with safe file validation and storage.
+- Ticket status workflow enforcement: OPEN -> IN_PROGRESS -> RESOLVED -> CLOSED, with ADMIN-only REJECTED.
+- Assign technician/staff member to a ticket.
+- Add resolution notes and rejection reason validation where required.
+- Add, edit, delete comments with ownership enforcement (owner or ADMIN).
+- Filter/search ticket list by status, priority, category, assignee, reporter, resource and keyword.
+- Ticket statistics endpoint for dashboard counters.
+
+Frontend client:
+- New ticket form with required validation and up to 3 image uploads.
+- Ticket listing with searching, filters, and summary cards.
+- Ticket details view with workflow actions, timeline, attachments, and comments.
+- Role-aware action behavior using user context headers.
+
+### Non-Functional Requirements
+
+- Security: input validation, role-aware authorization checks, safe file handling, request header-based actor identity, consistent error responses.
+- Performance: indexed MongoDB-friendly query patterns and lightweight summary endpoint for counts.
+- Scalability: layered architecture (controller/service/repository), decoupled attachment storage service, CI pipeline for continuous quality checks.
+- Usability: clear ticket workflow states, actionable detail page, form validation messages, and intuitive ticket list filtering.
+
+## Architecture Diagrams
+
+### Overall System Architecture
+
+```mermaid
+flowchart LR
+  U[Web Browser Users] --> FE[React Frontend - Vite]
+  FE --> API[Spring Boot REST API]
+  API --> DB[(MongoDB)]
+  API --> FS[(Attachment Storage - uploads/tickets)]
+  API --> WS[WebSocket Endpoint]
+  CI[GitHub Actions CI] --> API
+  CI --> FE
+```
+
+### REST API Architecture (Layered)
+
+```mermaid
+flowchart TD
+  C[TicketController] --> S[TicketService]
+  S --> R[TicketRepository]
+  S --> ST[AttachmentStorageService]
+  R --> M[(MongoDB tickets collection)]
+  ST --> F[(Local File Storage)]
+  E[GlobalExceptionHandler] -.handles.-> C
+  SEC[SecurityConfig + CORS] -.guards.-> C
+```
+
+### Frontend Ticket Architecture
+
+```mermaid
+flowchart TD
+  P1[NewTicketPage] --> TS[ticketService]
+  P2[TicketListPage] --> TS
+  P3[TicketDetailsPage] --> TS
+  TS --> API[/api/tickets]
+  API --> DB[(MongoDB)]
+```
+
+## Module C API Endpoints
+
+Implemented under `/api/tickets`:
+- `POST /api/tickets` - Create ticket.
+- `POST /api/tickets/with-attachments` - Create ticket with up to 3 image files.
+- `GET /api/tickets` - List/filter tickets.
+- `GET /api/tickets/my` - List current user tickets.
+- `GET /api/tickets/{id}` - Get ticket details.
+- `PUT /api/tickets/{id}` - Update ticket details.
+- `PATCH /api/tickets/{id}/status` - Update status with workflow validation.
+- `PATCH /api/tickets/{id}/assign` - Assign technician.
+- `DELETE /api/tickets/{id}` - Delete ticket (owner or ADMIN).
+- `POST /api/tickets/{id}/attachments` - Add attachment.
+- `GET /api/tickets/{id}/attachments/{attachmentId}/download` - Download attachment.
+- `DELETE /api/tickets/{id}/attachments/{attachmentId}` - Remove attachment.
+- `POST /api/tickets/{id}/comments` - Add comment.
+- `PUT /api/tickets/{id}/comments/{commentId}` - Edit comment.
+- `DELETE /api/tickets/{id}/comments/{commentId}` - Delete comment.
+- `GET /api/tickets/stats` - Get ticket stats.
+
+## Validation and Error Handling
+
+- Bean validation on DTOs (`@NotBlank`, `@NotNull`, `@Size`, `@Email`, `@Pattern`).
+- Centralized error handling with meaningful status codes and structured response body.
+- Business-rule validation for invalid ticket state transitions.
+- Attachment constraints: image-only mime types, max size 10MB each, max 3 attachments per ticket.
+
+## Testing and Quality Evidence
+
+Backend tests currently include:
+- `TicketServiceTest` (workflow validation, attachment limit, comment ownership, ticket creation defaults).
+- Spring context test for application startup.
+
+Validation commands used:
+- Backend: `./mvnw test`
+- Frontend: `npm run build`
+
+## CI Pipeline
+
+GitHub Actions workflow added at `.github/workflows/ci.yml`:
+- Backend job: Maven test on Java 17.
+- Frontend job: npm ci + production build on Node 20.
 
 ## 🚀 Quick Setup
 

@@ -1,128 +1,76 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import Layout from './components/Layout.jsx';
-import AdminLayout from './components/AdminLayout.jsx';
-import TechnicianLayout from './components/TechnicianLayout.jsx';
-import PageShell from './components/PageShell.jsx';
-import ResourceList from './components/ResourceList.jsx';
-import AboutPage from './pages/AboutPage.jsx';
-import ContactPage from './pages/ContactPage.jsx';
-import DashboardPage from './pages/DashboardPage.jsx';
-import TechnicianDashboard from './pages/TechnicianDashboard.jsx';
-import ProfilePage from './pages/ProfilePage.jsx';
-import AdminProfile from './pages/AdminProfile.jsx';
-import TechnicianProfile from './pages/TechnicianProfile.jsx';
-import HomePage from './pages/HomePage.jsx';
-import PlaceholderPage from './pages/PlaceholderPage.jsx';
-import LoginPage from './pages/LoginPage.jsx';
-import SignupPage from './pages/SignupPage.jsx';
-import AdminDashboard from './pages/AdminDashboard.jsx';
+import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Layout from "./components/Layout.jsx";
+import DashboardLayout from "./components/DashboardLayout.jsx";
+import LoaderPage from "./components/Loader.jsx";
+import HomePage from "./pages/HomePage.jsx";
+import DashboardPage from "./pages/DashboardPage.jsx";
+import DashboardSectionPage from "./pages/DashboardSectionPage.jsx";
+import TicketListPage from "./pages/TicketListPage.jsx";
+import NewTicketPage from "./pages/NewTicketPage.jsx";
+import TicketDetailPage from "./pages/TicketDetailsPage.jsx";
+import UserTicketDashboardPage from "./pages/UserTicketDashboardPage.jsx";
+import UserTicketDetailsPage from "./pages/UserTicketDetailsPage.jsx";
+import TechnicianDashboardPage from "./pages/TechnicianDashboardPage.jsx";
+import TechnicianSolutionPage from "./pages/TechnicianSolutionPage.jsx";
+import AboutPage from "./pages/AboutPage.jsx";
+import ContactPage from "./pages/ContactPage.jsx";
+
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000); // Show loader for 2 seconds
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <LoaderPage loading={true} message="Loading SmartCampus..." />;
+  }
+
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          {/* Admin routes with AdminLayout */}
-          <Route
-            path="/admin/users"
-            element={
-              <AdminLayout>
-                <AdminDashboard />
-              </AdminLayout>
-            }
-          />
-          <Route
-            path="/admin/profile"
-            element={
-              <AdminLayout>
-                <AdminProfile />
-              </AdminLayout>
-            }
-          />
+      <Routes>
+        <Route
+          path="/dashboard"
+          element={<DashboardLayout />}
+        >
+          <Route index element={<DashboardPage />} />
+          <Route path="facilities" element={<DashboardSectionPage title="Facilities" description="Manage campus facilities and resources." />} />
+          <Route path="bookings" element={<DashboardSectionPage title="Bookings" description="View and manage booking requests." />} />
+          <Route path="incidents" element={<TicketListPage />} />
+          <Route path="incidents/new" element={<NewTicketPage />} />
+          <Route path="incidents/:ticketId" element={<TicketDetailPage />} />
+          <Route path="my-tickets" element={<UserTicketDashboardPage />} />
+          <Route path="my-tickets/:ticketId" element={<UserTicketDetailsPage />} />
+          <Route path="technician" element={<TechnicianDashboardPage />} />
+          <Route path="technician/:ticketId/solve" element={<TechnicianSolutionPage />} />
+          <Route path="notifications" element={<DashboardSectionPage title="Notifications" description="Review alerts and system updates." />} />
+          <Route path="profile" element={<DashboardSectionPage title="Profile" description="Update profile preferences and account details." />} />
+        </Route>
 
-          {/* Technician routes with TechnicianLayout */}
+        <Route element={<Layout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/tickets" element={<TicketListPage />} />
+          <Route path="/tickets/new" element={<NewTicketPage />} />
+          <Route path="/tickets/:id" element={<TicketDetailPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route
-            path="/technician-dashboard"
+            path="/bookings"
             element={
-              <TechnicianLayout>
-                <TechnicianDashboard />
-              </TechnicianLayout>
+              <LoaderPage
+                loading={false}
+                message="Booking management and approval workflows will appear here."
+              />
             }
           />
-          <Route
-            path="/technician-profile"
-            element={
-              <TechnicianLayout>
-                <TechnicianProfile />
-              </TechnicianLayout>
-            }
-          />
-
-          {/* All other routes with standard Layout */}
-          <Route
-            path="*"
-            element={
-              <Layout>
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/about" element={<AboutPage />} />
-                  <Route path="/contact" element={<ContactPage />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/sign-in" element={<LoginPage />} />
-                  <Route path="/signup" element={<SignupPage />} />
-                  <Route
-                    path="/dashboard"
-                    element={
-                      <PageShell>
-                        <DashboardPage />
-                      </PageShell>
-                    }
-                  />
-                  <Route
-                    path="/profile"
-                    element={
-                      <PageShell>
-                        <ProfilePage />
-                      </PageShell>
-                    }
-                  />
-                  <Route
-                    path="/resources"
-                    element={
-                      <PageShell>
-                        <ResourceList />
-                      </PageShell>
-                    }
-                  />
-                  <Route
-                    path="/bookings"
-                    element={
-                      <PageShell>
-                        <PlaceholderPage
-                          title="Bookings"
-                          description="Booking management and approval workflows will appear here."
-                        />
-                      </PageShell>
-                    }
-                  />
-                  <Route
-                    path="/maintenance"
-                    element={
-                      <PageShell>
-                        <PlaceholderPage
-                          title="Maintenance"
-                          description="Maintenance ticket tracking will appear here."
-                        />
-                      </PageShell>
-                    }
-                  />
-                </Routes>
-              </Layout>
-            }
-          />
-        </Routes>
-      </AuthProvider>
+          <Route path="/login" element={<Navigate to="/" replace />} />
+          <Route path="/signup" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }
