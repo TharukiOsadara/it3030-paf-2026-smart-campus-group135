@@ -115,6 +115,13 @@ export const ticketService = {
     return handleResponse(res);
   },
 
+  // ── GET: List of technicians (for auto-assign)
+  getTechnicians: async () => {
+    const res = await fetch(`${BASE}/auth/technicians`, { headers: headers() });
+    const list = await handleResponse(res);
+    return Array.isArray(list) ? list : [];
+  },
+
   // ── DELETE: Delete a ticket (Admin only)
   deleteTicket: async (id) => {
     const res = await fetch(`${BASE}/tickets/${id}`, {

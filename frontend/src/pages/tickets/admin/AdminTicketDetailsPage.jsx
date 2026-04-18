@@ -122,6 +122,7 @@ export default function TicketDetailsPage() {
   const [comment, setComment] = useState("");
   const [adminSolution, setAdminSolution] = useState("");
   const [adminMessage, setAdminMessage] = useState("");
+  const [technicianId, setTechnicianId] = useState("");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [actionBusy, setActionBusy] = useState(false);
@@ -134,7 +135,8 @@ export default function TicketDetailsPage() {
         setLoading(true);
         setLoadError("");
         const response = await ticketService.getTicketById(ticketId);
-        setTicket(mapTicket(response));
+        const mapped = mapTicket(response);
+        setTicket(mapped);
       } catch (error) {
         setLoadError(error.message || "Failed to load ticket");
       } finally {
@@ -144,6 +146,20 @@ export default function TicketDetailsPage() {
 
     loadTicket();
   }, [ticketId]);
+
+  useEffect(() => {
+    const loadTechnician = async () => {
+      try {
+        const technicians = await ticketService.getTechnicians();
+        if (technicians.length > 0) {
+          setTechnicianId(technicians[0].id);
+        }
+      } catch {
+        // Silently ignore; Assign button stays disabled if lookup fails.
+      }
+    };
+    loadTechnician();
+  }, []);
 
   const updateStatus = async (nextStatus, options = {}) => {
     if (!ticket || actionBusy) return;
@@ -251,14 +267,31 @@ export default function TicketDetailsPage() {
   const assignTechnicianAndOpenDashboard = async () => {
     if (!ticket || actionBusy || ticket.status === "Resolved") return;
 
-    const technicianId = (ticket.assignee || "technician-1").trim();
-
     try {
       setActionBusy(true);
+      setLoadError("");
+
+      // Resolve the technician ID (preloaded or fetched now)
+      let resolvedTechId = technicianId;
+      if (!resolvedTechId) {
+        try {
+          const technicians = await ticketService.getTechnicians();
+          if (technicians.length > 0) {
+            resolvedTechId = technicians[0].id;
+            setTechnicianId(resolvedTechId);
+          }
+        } catch {
+          // Fallback handled below.
+        }
+      }
+      if (!resolvedTechId) {
+        resolvedTechId = "tech@smartcampus.com";
+      }
+
       let nextTicket = ticket;
 
       try {
-        const assigned = await ticketService.assignTechnician(ticket.id, technicianId);
+        const assigned = await ticketService.assignTechnician(ticket.id, resolvedTechId);
         nextTicket = mapTicket(assigned);
       } catch {
         // Continue with local assignment fallback when backend role restrictions apply.
@@ -280,12 +313,12 @@ export default function TicketDetailsPage() {
         }
       }
 
-      saveTechnicianAssignment(technicianId, ticket.id);
+      saveTechnicianAssignment(resolvedTechId, ticket.id);
       setTicket({
         ...nextTicket,
-        assignee: nextTicket.assignee || technicianId,
+        assignee: nextTicket.assignee || resolvedTechId,
       });
-      navigate(`/dashboard/technician?ticketId=${ticket.id}&filter=Latest`);
+      navigate("/dashboard/incidents", { replace: true });
     } catch (error) {
       setLoadError(error.message || "Failed to assign technician");
     } finally {
@@ -494,20 +527,6 @@ export default function TicketDetailsPage() {
 
           <article className="ticket-detail-page__panel">
             <h2>Actions</h2>
-            <div className="ticket-detail-page__comment-box" style={{ marginBottom: "0.8rem" }}>
-              <textarea
-                placeholder="Admin solution for this ticket..."
-                value={adminSolution}
-                onChange={(event) => setAdminSolution(event.target.value)}
-                rows={3}
-              />
-              <textarea
-                placeholder="Message to user..."
-                value={adminMessage}
-                onChange={(event) => setAdminMessage(event.target.value)}
-                rows={3}
-              />
-            </div>
             <div className="ticket-detail-page__actions">
               <button className="ticket-detail-page__action ticket-detail-page__action--primary" disabled={actionBusy || ticket.status === "Resolved"} onClick={assignTechnicianAndOpenDashboard}>Assign Technician</button>
               <button className="ticket-detail-page__action ticket-detail-page__action--neutral" disabled={actionBusy} onClick={sendToUser}>Send to User</button>

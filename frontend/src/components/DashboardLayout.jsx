@@ -1,10 +1,15 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { AppSidebar } from "./AppSidebar";
 
 export default function DashboardLayout() {
-  const [collapsed, setCollapsed] = useState(false);
+  const { user, loading } = useAuth();
+  const [collapsed, setCollapsed]   = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  if (loading) return null;
+  if (!user)   return <Navigate to="/login" replace />;
 
   const handleToggleSidebar = () => {
     if (window.innerWidth <= 980) {
@@ -21,7 +26,6 @@ export default function DashboardLayout() {
         onNavigate={() => setMobileOpen(false)}
         onToggle={handleToggleSidebar}
       />
-
       <div className="dashboard-shell__main">
         <main className="dashboard-shell__content">
           <Outlet />

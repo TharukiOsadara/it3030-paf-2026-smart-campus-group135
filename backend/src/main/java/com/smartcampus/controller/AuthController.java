@@ -1,12 +1,14 @@
 package com.smartcampus.controller;
 
 import com.smartcampus.dto.LoginResponseDTO;
+import com.smartcampus.model.Ticket;
 import com.smartcampus.model.User;
 import com.smartcampus.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -50,5 +52,18 @@ public class AuthController {
         return userRepository.findById(userId)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @GetMapping("/technicians")
+    public ResponseEntity<List<Map<String, String>>> getTechnicians() {
+        List<Map<String, String>> technicians = userRepository.findByRole(Ticket.UserRole.TECHNICIAN)
+                .stream()
+                .map(u -> Map.of(
+                        "id",    u.getId(),
+                        "name",  u.getName() == null ? "" : u.getName(),
+                        "email", u.getEmail() == null ? "" : u.getEmail()
+                ))
+                .toList();
+        return ResponseEntity.ok(technicians);
     }
 }

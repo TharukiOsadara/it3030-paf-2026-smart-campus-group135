@@ -17,14 +17,35 @@ public class UserSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+
+        if (userRepository.findByEmail("admin@smartcampus.com").isEmpty()) {
+            User admin = new User();
+            admin.setName("Admin User");
+            admin.setEmail("admin@smartcampus.com");
+            admin.setPassword("admin123");
+            admin.setRole(Ticket.UserRole.ADMIN);
+            userRepository.save(admin);
+            System.out.println("[Seeder] admin@smartcampus.com / admin123  (ADMIN)");
+        }
+
+        if (userRepository.findByEmail("user@smartcampus.com").isEmpty()) {
+            User user = new User();
+            user.setName("Regular User");
+            user.setEmail("user@smartcampus.com");
+            user.setPassword("user123");
+            user.setRole(Ticket.UserRole.USER);
+            userRepository.save(user);
+            System.out.println("[Seeder] user@smartcampus.com / user123  (USER)");
+        }
+
         if (userRepository.findByEmail("tech@smartcampus.com").isEmpty()) {
             User tech = new User();
             tech.setName("Technician One");
             tech.setEmail("tech@smartcampus.com");
-            tech.setPassword("tech123"); // In a real app, hash this
+            tech.setPassword("tech123");
             tech.setRole(Ticket.UserRole.TECHNICIAN);
             userRepository.save(tech);
-            System.out.println("Seeded technician user: tech@smartcampus.com / tech123");
+            System.out.println("[Seeder] tech@smartcampus.com / tech123  (TECHNICIAN)");
         }
     }
 }

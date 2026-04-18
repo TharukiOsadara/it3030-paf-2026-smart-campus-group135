@@ -187,7 +187,7 @@ export default function TechnicianDashboardPage() {
         const localAssignedIds = readAssignedTicketIds(technicianId);
         let list = [];
         try {
-          const allTickets = await ticketService.getAllTickets();
+          const allTickets = await ticketService.getAllTickets({ assignedTo: technicianId });
           list = Array.isArray(allTickets) ? allTickets : [];
         } catch {
           // Non-admin sessions may not access this endpoint.
