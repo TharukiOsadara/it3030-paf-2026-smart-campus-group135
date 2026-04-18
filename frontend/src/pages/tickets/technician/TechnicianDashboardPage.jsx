@@ -2,16 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Search, AlertTriangle, Clock3, CheckCircle2, Trash2 } from "lucide-react";
 import { ticketService } from "../../../services/TicketServices";
+import { useAuth } from "../../../context/AuthContext";
 
 const TECH_ASSIGNMENTS_KEY = "sc_technician_assignments_v1";
 const TECH_VIEWED_KEY = "sc_technician_viewed_v1";
 const TECH_WORKFLOW_KEY = "sc_technician_workflow_v1";
 const TECH_DISMISSED_RESOLVED_KEY = "sc_technician_dismissed_resolved_v1";
-
-const getCurrentUserId = () =>
-  localStorage.getItem("sc_user_id") ||
-  localStorage.getItem("userId") ||
-  "technician-1";
 
 const toUiValue = (value) => {
   if (!value) return "";
@@ -161,7 +157,8 @@ export default function TechnicianDashboardPage() {
     return "Open";
   });
 
-  const technicianId = getCurrentUserId();
+  const { user, loading: authLoading } = useAuth();
+  const technicianId = user?.id || "technician-1";
   const [viewedTicketIds, setViewedTicketIds] = useState(() => readViewedTicketIds(technicianId));
   const [workflowMap, setWorkflowMap] = useState(() => readWorkflowMap());
   const [dismissedResolvedIds, setDismissedResolvedIds] = useState(() => readDismissedResolved(technicianId));
