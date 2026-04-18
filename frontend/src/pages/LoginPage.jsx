@@ -77,7 +77,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center px-4">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#061425] via-[#0b1f38] to-[#101826] px-4 py-10">
+      <div
+        className="pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full bg-[#3B82F6]/20 blur-[110px]"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute -right-20 bottom-10 h-72 w-72 rounded-full bg-cyan-400/15 blur-[110px]"
+        aria-hidden
+      />
       <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-[#1F2937] bg-[#111827] p-10 shadow-2xl shadow-black/40">
         {/* Decorative glow */}
         <div
