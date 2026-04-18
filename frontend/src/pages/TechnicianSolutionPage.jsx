@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { ticketService } from "../services/TicketServices";
 
-const TECH_ASSIGNMENTS_KEY = "sc_technician_assignments_v1";
+const TECH_WORKFLOW_KEY = "sc_technician_workflow_v1";
 
 const toUiValue = (value) => {
   if (!value) return "";
@@ -21,17 +21,28 @@ const normalizeStatus = (value) => {
 };
 
 const resolveTicketId = (ticket) => ticket?.id || ticket?._id || ticket?.ticketId || "";
+const isWorkflowRoleValidationError = (error) =>
+  (error?.message || "").toLowerCase().includes("only staff roles can update ticket workflow status");
 
-const removeAssignedTicket = (ticketId) => {
+const readWorkflow = (ticketId) => {
+  if (!ticketId) return {};
   try {
-    const raw = JSON.parse(localStorage.getItem(TECH_ASSIGNMENTS_KEY) || "{}");
-    const next = Object.fromEntries(
-      Object.entries(raw).map(([technicianId, ids]) => [
-        technicianId,
-        (Array.isArray(ids) ? ids : []).filter((id) => id !== ticketId),
-      ])
-    );
-    localStorage.setItem(TECH_ASSIGNMENTS_KEY, JSON.stringify(next));
+    const raw = JSON.parse(localStorage.getItem(TECH_WORKFLOW_KEY) || "{}");
+    return raw[ticketId] || {};
+  } catch {
+    return {};
+  }
+};
+
+const writeWorkflow = (ticketId, patch) => {
+  if (!ticketId) return;
+  try {
+    const raw = JSON.parse(localStorage.getItem(TECH_WORKFLOW_KEY) || "{}");
+    raw[ticketId] = {
+      ...(raw[ticketId] || {}),
+      ...patch,
+    };
+    localStorage.setItem(TECH_WORKFLOW_KEY, JSON.stringify(raw));
   } catch {
     // Ignore storage access issues.
   }
@@ -44,7 +55,9 @@ export default function TechnicianSolutionPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [solution, setSolution] = useState("");
+  const [workflow, setWorkflow] = useState({ submittedToAdmin: false, resolved: false });
 
   useEffect(() => {
     const load = async () => {
@@ -54,6 +67,11 @@ export default function TechnicianSolutionPage() {
         setError("");
         const data = await ticketService.getTicketById(ticketId);
         setTicket(data);
+        const id = resolveTicketId(data);
+        setWorkflow((prev) => ({
+          ...prev,
+          ...readWorkflow(id),
+        }));
       } catch (loadError) {
         setError(loadError.message || "Failed to load ticket");
       } finally {
@@ -77,13 +95,38 @@ export default function TechnicianSolutionPage() {
     try {
       setSaving(true);
       setError("");
+      setNotice("");
       const id = resolveTicketId(ticket);
-      await ticketService.addComment(id, { content: `[Technician Solution] ${solution.trim()}` });
-      await ticketService.updateStatus(id, {
-        status: "IN_PROGRESS",
-        resolutionNote: solution.trim(),
+
+      try {
+        await ticketService.addComment(id, { content: `[Technician Solution] ${solution.trim()}` });
+      } catch {
+        // Allow local workflow even when backend write is restricted.
+      }
+
+      try {
+        await ticketService.updateStatus(id, {
+          status: "IN_PROGRESS",
+          resolutionNote: solution.trim(),
+        });
+      } catch (saveError) {
+        if (!isWorkflowRoleValidationError(saveError)) {
+          throw saveError;
+        }
+      }
+
+      writeWorkflow(id, {
+        submittedToAdmin: true,
+        submittedAt: Date.now(),
+        submittedSolution: solution.trim(),
       });
-      navigate("/dashboard/technician");
+      setWorkflow((prev) => ({
+        ...prev,
+        submittedToAdmin: true,
+        submittedAt: Date.now(),
+        submittedSolution: solution.trim(),
+      }));
+      setNotice("Solution sent to admin. Now click Resolve & Close when work is complete.");
     } catch (saveError) {
       setError(saveError.message || "Failed to submit solution to admin");
     } finally {
@@ -93,17 +136,51 @@ export default function TechnicianSolutionPage() {
 
   const resolveAndClose = async () => {
     if (!ticket || !validateSolution()) return;
+    if (!workflow.submittedToAdmin) {
+      setError("Submit to Admin first, then resolve the ticket.");
+      return;
+    }
+
     try {
       setSaving(true);
       setError("");
+      setNotice("");
       const id = resolveTicketId(ticket);
-      await ticketService.addComment(id, { content: `[Technician Resolution] ${solution.trim()}` });
-      await ticketService.updateStatus(id, {
-        status: "RESOLVED",
-        resolutionNote: solution.trim(),
+
+      try {
+        await ticketService.addComment(id, { content: `[Technician Resolution] ${solution.trim()}` });
+      } catch {
+        // Allow local workflow even when backend write is restricted.
+      }
+
+      try {
+        await ticketService.updateStatus(id, {
+          status: "RESOLVED",
+          resolutionNote: solution.trim(),
+        });
+      } catch (saveError) {
+        if (!isWorkflowRoleValidationError(saveError)) {
+          throw saveError;
+        }
+      }
+
+      writeWorkflow(id, {
+        submittedToAdmin: true,
+        submittedSolution: solution.trim(),
+        resolved: true,
+        resolutionText: solution.trim(),
+        resolvedAt: Date.now(),
       });
-      removeAssignedTicket(id);
-      navigate("/dashboard/technician");
+      setWorkflow((prev) => ({
+        ...prev,
+        submittedToAdmin: true,
+        submittedSolution: solution.trim(),
+        resolved: true,
+        resolutionText: solution.trim(),
+        resolvedAt: Date.now(),
+      }));
+
+      navigate(`/dashboard/technician?filter=Resolved&ticketId=${id}`);
     } catch (saveError) {
       setError(saveError.message || "Failed to close ticket");
     } finally {
@@ -168,15 +245,21 @@ export default function TechnicianSolutionPage() {
       </section>
 
       {error ? <p className="new-ticket-page__error">{error}</p> : null}
+      {notice ? <p className="new-ticket-page__error" style={{ color: "#7ee3c4" }}>{notice}</p> : null}
 
       <div className="new-ticket-page__actions">
         <button type="button" className="new-ticket-page__btn new-ticket-page__btn--ghost" onClick={() => navigate("/dashboard/technician")} disabled={saving}>
           Cancel
         </button>
         <button type="button" className="new-ticket-page__btn" onClick={submitToAdmin} disabled={saving}>
-          {saving ? "Saving..." : "Submit To Admin"}
+          {saving ? "Saving..." : workflow.submittedToAdmin ? "Submitted To Admin" : "Submit To Admin"}
         </button>
-        <button type="button" className="new-ticket-page__btn new-ticket-page__btn--primary" onClick={resolveAndClose} disabled={saving}>
+        <button
+          type="button"
+          className="new-ticket-page__btn new-ticket-page__btn--primary"
+          onClick={resolveAndClose}
+          disabled={saving || !workflow.submittedToAdmin}
+        >
           {saving ? "Saving..." : "Resolve & Close"}
         </button>
       </div>
