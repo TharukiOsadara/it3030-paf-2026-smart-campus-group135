@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-background: var(--bg-main);
+  --color-surface: var(--bg-surface);
+  --color-input: var(--bg-input);
+  --color-border: var(--border-color);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-muted: var(--text-muted);
+}
+
+:root {
+  --bg-main: #f9fafb;
+  --bg-surface: #ffffff;
+  --bg-input: #f3f4f6;
+  --bg-elevated: #ffffff;
+
+  --border-color: #e5e7eb;
+  --border-default: #e5e7eb;
+
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #4b5563;
+
+  --btn-primary-bg: #0a84ff;
+  --btn-primary-hover: #3b82f6;
+
+  --color-primary: #0a84ff;
+  --color-primary-glow: rgba(10, 132, 255, 0.25);
+
+  --brand-gradient: linear-gradient(135deg, #0A84FF 0%, #8B74EA 100%);
+}
+
+.dark {
+  --bg-main: #050505;
+  --bg-surface: #151619;
+  --bg-input: #0a0a0a;
+  --bg-elevated: #101114;
+
+  --border-color: #2a2b30;
+  --border-default: #2a2b30;
+
+  --text-primary: #ffffff;
+  --text-secondary: #9ca3af;
+  --text-muted: #d1d5db;
+
+  --btn-primary-bg: #0a84ff;
+  --btn-primary-hover: #3b82f6;
+
+  --color-primary: #0a84ff;
+  --color-primary-glow: rgba(10, 132, 255, 0.25);
+
+  --brand-gradient: linear-gradient(135deg, #0A84FF 0%, #8B74EA 100%);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.brand-gradient-text {
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.brand-gradient-bg {
+  background: var(--brand-gradient);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+body,
+input,
+select,
+textarea,
+button,
+div,
+header,
+main,
+nav,
+section,
+table,
+tr,
+td,
+th {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}

@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({InvalidTicketTransitionException.class, InvalidAttachmentException.class})
     public ResponseEntity<ErrorResponse> handleUnprocessable(RuntimeException ex, HttpServletRequest request) {
-        return build(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(), "Unprocessable Content", request.getRequestURI());
+        return build(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), "Unprocessable Content", request.getRequestURI());
     }
 
     @ExceptionHandler(AttachmentLimitExceededException.class)
