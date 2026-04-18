@@ -8,13 +8,15 @@ import DashboardPage from "./pages/DashboardPage.jsx";
 import DashboardSectionPage from "./pages/DashboardSectionPage.jsx";
 import TicketListPage from "./pages/TicketListPage.jsx";
 import NewTicketPage from "./pages/NewTicketPage.jsx";
-import TicketDetailPage from "./pages/TicketDetailsPage.jsx";
+import TicketDetailPage from "./pages/TicketDetailPage.jsx";
 import UserTicketDashboardPage from "./pages/UserTicketDashboardPage.jsx";
 import UserTicketDetailsPage from "./pages/UserTicketDetailsPage.jsx";
 import TechnicianDashboardPage from "./pages/TechnicianDashboardPage.jsx";
 import TechnicianSolutionPage from "./pages/TechnicianSolutionPage.jsx";
 import AboutPage from "./pages/AboutPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import SignupPage from "./pages/SignupPage.jsx";
 
 
 function App() {
@@ -66,8 +68,8 @@ function App() {
               />
             }
           />
-          <Route path="/login" element={<Navigate to="/" replace />} />
-          <Route path="/signup" element={<Navigate to="/" replace />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
