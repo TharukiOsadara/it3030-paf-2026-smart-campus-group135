@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 
 const NAV_LINKS = [
   { path: "/",          label: "Home" },
-  { path: "/dashboard", label: "Dashboard" },
+  { path: "/login", label: "Dashboard" },
   { path: "/about",     label: "About" },
   { path: "/contact",   label: "Contact Us" },
 ];
