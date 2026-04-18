@@ -5,13 +5,13 @@ const mainItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Facilities", url: "/dashboard/facilities", icon: Building2 },
   { title: "Bookings", url: "/dashboard/bookings", icon: Calendar },
-  { title: "Tickets", url: "/dashboard/incidents", icon: Wrench },
+  { title: "My Tickets", url: "/dashboard/my-tickets", icon: Wrench },
   { title: "Notifications", url: "/dashboard/notifications", icon: Bell },
 ];
 
 const accountItems = [
-  { title: "My Tickets", url: "/dashboard/my-tickets", icon: Wrench },
-  { title: "Technician", url: "/dashboard/technician", icon: Wrench },
+  { title: "Tickets", url: "/dashboard/incidents", icon: Wrench },
+  { title: "Technician", url: "/dashboard/technician?filter=Latest", icon: Wrench },
   { title: "Profile", url: "/dashboard/profile", icon: User },
 ];
 
