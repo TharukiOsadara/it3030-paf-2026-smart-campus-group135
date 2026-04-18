@@ -33,12 +33,45 @@ const formatDateTime = (value) => {
 
 const resolveTicketId = (ticket) => ticket?.id || ticket?._id || ticket?.ticketId || "";
 
+const extractLatestSolutionInfo = (items) => {
+  if (!Array.isArray(items)) return { source: "Unknown", text: "" };
+
+  const latest = [...items]
+    .filter((item) => {
+      const content = (item?.content || "").toString();
+      return (
+        content.startsWith("[Admin Solution]") ||
+        content.startsWith("[Technician Solution]") ||
+        content.startsWith("[Technician Resolution]")
+      );
+    })
+    .at(-1);
+
+  if (!latest) return { source: "Unknown", text: "" };
+
+  const raw = (latest.content || "").toString();
+  if (raw.startsWith("[Admin Solution]")) {
+    return { source: "Admin", text: raw.replace("[Admin Solution]", "").trim() };
+  }
+  return {
+    source: "Technician",
+    text: raw.replace("[Technician Resolution]", "").replace("[Technician Solution]", "").trim(),
+  };
+};
+
 const mapTicket = (ticket) => {
   const activities = Array.isArray(ticket.activities) ? ticket.activities : [];
   const comments = Array.isArray(ticket.comments) ? ticket.comments : [];
+  const latestSolution = extractLatestSolutionInfo(comments);
+  const isAdminTagged = (value) => (value || "").toString().trim().toLowerCase().startsWith("[admin]");
+  const isAdminLikeUser = (value) => (value || "").toString().toLowerCase().includes("admin");
   const adminResponses = [
     ...activities
-      .filter((item) => ["ADMIN", "STAFF", "TECHNICIAN"].includes((item.actorRole || "").toUpperCase()))
+      .filter((item) =>
+        ["ADMIN", "STAFF", "TECHNICIAN"].includes((item.actorRole || "").toUpperCase()) ||
+        isAdminLikeUser(item.actorId) ||
+        isAdminTagged(item.content)
+      )
       .map((item) => ({
         id: item.id,
         author: item.actorId || "Admin",
@@ -47,7 +80,11 @@ const mapTicket = (ticket) => {
         type: "activity",
       })),
     ...comments
-      .filter((item) => ["ADMIN", "STAFF", "TECHNICIAN"].includes((item.userRole || "").toUpperCase()))
+      .filter((item) =>
+        ["ADMIN", "STAFF", "TECHNICIAN"].includes((item.userRole || "").toUpperCase()) ||
+        isAdminLikeUser(item.userId) ||
+        isAdminTagged(item.content)
+      )
       .map((item) => ({
         id: item.id,
         author: item.userId || "Admin",
@@ -66,6 +103,20 @@ const mapTicket = (ticket) => {
     category: toUiValue(ticket.category) || "General",
     location: ticket.location || "Location not provided",
     createdAt: formatDateTime(ticket.createdAt || ticket.updatedAt),
+    adminSolution: comments
+      .filter((item) => (item.content || "").startsWith("[Admin Solution]"))
+      .map((item) => (item.content || "").replace("[Admin Solution]", "").trim())
+      .at(-1) || "",
+    adminReply: comments
+      .filter((item) => (item.content || "").startsWith("[Admin]"))
+      .map((item) => (item.content || "").replace("[Admin]", "").trim())
+      .at(-1) || "",
+    technicianSolution: comments
+      .filter((item) => (item.content || "").startsWith("[Technician Resolution]") || (item.content || "").startsWith("[Technician Solution]"))
+      .map((item) => (item.content || "").replace("[Technician Resolution]", "").replace("[Technician Solution]", "").trim())
+      .at(-1) || "",
+    latestSolutionSource: latestSolution.source,
+    latestSolutionText: latestSolution.text,
     adminResponses,
   };
 };
@@ -120,6 +171,8 @@ export default function UserTicketDetailsPage() {
   }
 
   const solved = ticket.status === "Resolved";
+  const solutionSource = ticket.latestSolutionSource || (ticket.adminReply ? "Admin" : "Unknown");
+  const solutionText = ticket.latestSolutionText || ticket.adminSolution || ticket.technicianSolution || "No solution text yet.";
 
   return (
     <section className="user-ticket-detail">
@@ -152,6 +205,12 @@ export default function UserTicketDetailsPage() {
         <div className="user-ticket-detail__section">
           <h2>Description</h2>
           <p>{ticket.description}</p>
+        </div>
+
+        <div className="user-ticket-detail__section">
+          <h2>Resolution Summary</h2>
+          <p><strong>Source:</strong> {solutionSource}</p>
+          <p><strong>Solution:</strong> {solutionText} {solutionSource !== "Unknown" ? `(Provided by ${solutionSource})` : ""}</p>
         </div>
 
         <div className="user-ticket-detail__section">
