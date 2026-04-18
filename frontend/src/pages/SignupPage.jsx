@@ -89,22 +89,40 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center px-4 py-8">
-      <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-[#1F2937] bg-[#111827] p-10 shadow-2xl shadow-black/40">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#061425] via-[#0b1f38] to-[#101826] px-4 py-10">
+      <div
+        className="pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full bg-[#3B82F6]/20 blur-[110px]"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute -right-20 bottom-10 h-72 w-72 rounded-full bg-cyan-400/15 blur-[110px]"
+        aria-hidden
+      />
+      <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-[#1F2937] bg-[#111827] p-7 shadow-2xl shadow-black/40 sm:p-9">
         {/* Decorative glow */}
         <div
-          className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[#10B981]/20 blur-[80px]"
+          className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[#3B82F6]/20 blur-[80px]"
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-emerald-500/15 blur-[80px]"
+          className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-blue-500/15 blur-[80px]"
           aria-hidden
         />
-
         <div className="relative">
-          {/* Logo */}
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#10B981] text-xl font-bold text-white shadow-[0_0_32px_rgba(16,185,129,0.5)]">
-            SC
+          {/* Logo Icon */}
+          <div className="mb-5 flex justify-center">
+            <svg width="40" height="40" viewBox="0 0 28 28" fill="none">
+              <rect width="28" height="28" rx="8" fill="url(#logoGradSignup)" />
+              <path d="M14 8L6.2 11.8L14 15.6L21.8 11.8L14 8Z" stroke="white" strokeWidth="1.8" strokeLinejoin="round" />
+              <path d="M9.3 13.9V17C9.3 18 11.4 19.2 14 19.2C16.6 19.2 18.7 18 18.7 17V13.9" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M21.8 11.9V16.2" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+              <defs>
+                <linearGradient id="logoGradSignup" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#5A84F6" />
+                  <stop offset="1" stopColor="#9B75EE" />
+                </linearGradient>
+              </defs>
+            </svg>
           </div>
 
           <div className="text-center">
@@ -124,9 +142,9 @@ export default function SignupPage() {
           )}
 
           {/* Registration form */}
-          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+          <form onSubmit={handleSubmit} className="mt-7 space-y-5">
             <div>
-              <label htmlFor="signup-name" className="mb-1.5 block text-sm font-medium text-[#CBD5E1]">
+              <label htmlFor="signup-name" className="mb-2 block text-sm font-medium text-[#CBD5E1]">
                 Full Name
               </label>
               <input
@@ -142,7 +160,7 @@ export default function SignupPage() {
               />
             </div>
             <div>
-              <label htmlFor="signup-email" className="mb-1.5 block text-sm font-medium text-[#CBD5E1]">
+              <label htmlFor="signup-email" className="mb-2 block text-sm font-medium text-[#CBD5E1]">
                 Email
               </label>
               <input
@@ -158,7 +176,7 @@ export default function SignupPage() {
               />
             </div>
             <div>
-              <label htmlFor="signup-password" className="mb-1.5 block text-sm font-medium text-[#CBD5E1]">
+              <label htmlFor="signup-password" className="mb-2 block text-sm font-medium text-[#CBD5E1]">
                 Password
               </label>
               <input
@@ -174,7 +192,7 @@ export default function SignupPage() {
               />
             </div>
             <div>
-              <label htmlFor="signup-confirm" className="mb-1.5 block text-sm font-medium text-[#CBD5E1]">
+              <label htmlFor="signup-confirm" className="mb-2 block text-sm font-medium text-[#CBD5E1]">
                 Confirm Password
               </label>
               <input
