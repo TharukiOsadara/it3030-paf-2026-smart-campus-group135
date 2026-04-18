@@ -1,13 +1,18 @@
 
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Resource } from '../types/Resource';
 import { resourceApi } from '../api/resourceApi';
 import { ResourceForm } from './ResourceForm';
-import { Plus, Edit2, Trash2, Download } from 'lucide-react';
+import { Plus, Edit2, Trash2, Download, LayoutGrid, ShieldAlert, SunMedium } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 export const AdminPanel: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isCatalogueTab = location.pathname === '/dashboard/facilities';
+  const isAdminTab = location.pathname === '/dashboard/facilities/admin';
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -243,35 +248,88 @@ export const AdminPanel: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center bg-surface p-6 rounded-xl border border-border transition-colors duration-300">
-        <div>
-          <h2 className="text-xl font-semibold text-primary">Resource Management</h2>
-          <p className="text-sm text-secondary mt-1">Add, update, or remove resources</p>
+    <div className="mx-auto max-w-[1380px] space-y-6">
+      <div className="px-1 py-1">
+        <div className="flex items-center justify-between gap-3">
+          <div className="inline-flex items-center gap-3">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-[#1742a6] text-xs font-bold text-white shadow-[0_5px_14px_rgba(22,66,166,0.45)]">
+              S
+            </span>
+            <span className="text-base font-semibold tracking-tight text-[#8fb0ff]">Smart Campus</span>
+          </div>
+          <div className="ml-auto inline-flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => navigate('/dashboard/facilities')}
+              className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+                isCatalogueTab
+                  ? 'border-[#86a8ff63] bg-[linear-gradient(145deg,rgba(47,73,128,0.62),rgba(25,43,84,0.72))] text-primary shadow-[0_10px_24px_rgba(21,50,112,0.45)]'
+                  : 'border-transparent text-[#9ab1e4] hover:border-[#86a8ff3a] hover:bg-[rgba(39,61,109,0.45)] hover:text-primary'
+              }`}
+            >
+              <LayoutGrid className={`h-4 w-4 ${isCatalogueTab ? 'text-[#b8cbff]' : 'text-[#8ea6d7]'}`} />
+              Catalogue
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/dashboard/facilities/admin')}
+              className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+                isAdminTab
+                  ? 'border-[#86a8ff63] bg-[linear-gradient(145deg,rgba(47,73,128,0.62),rgba(25,43,84,0.72))] text-primary shadow-[0_10px_24px_rgba(21,50,112,0.45)]'
+                  : 'border-transparent text-[#9ab1e4] hover:border-[#86a8ff3a] hover:bg-[rgba(39,61,109,0.45)] hover:text-primary'
+              }`}
+            >
+              <ShieldAlert className={`h-4 w-4 ${isAdminTab ? 'text-[#b8cbff]' : 'text-[#8ea6d7]'}`} />
+              Admin
+            </button>
+            <button
+              type="button"
+              aria-label="System settings"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-transparent text-[#94acdc] transition-all duration-200 hover:border-[#86a8ff3a] hover:bg-[rgba(39,61,109,0.45)] hover:text-[#c1d2ff]"
+            >
+              <SunMedium className="h-4 w-4" />
+            </button>
+          </div>
         </div>
-
-        <button
-          onClick={handleAdd}
-          className="text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2"
-          style={{
-            background: '#0B3D91',
-            boxShadow: '0 4px 15px rgba(11,61,145,0.30)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = '#124AAE';
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(11,61,145,0.42)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = '#0B3D91';
-            e.currentTarget.style.boxShadow = '0 4px 15px rgba(11,61,145,0.30)';
-          }}
-        >
-          <Plus className="w-5 h-5" />
-          Add Resource
-        </button>
       </div>
 
-      <div className="bg-surface rounded-xl border border-border overflow-hidden transition-colors duration-300">
+      <section className="rounded-2xl border border-[#314a76]/65 bg-[linear-gradient(145deg,rgba(16,35,70,0.52),rgba(7,18,40,0.75))] p-6 shadow-[0_16px_36px_rgba(2,8,24,0.36)] backdrop-blur-sm">
+        <div className="mb-6">
+          <h1 className="text-4xl font-bold tracking-tight text-primary">Admin Dashboard</h1>
+          <p className="mt-2 text-lg text-[#c4d4f8]">Manage resources, update details, and monitor availability.</p>
+        </div>
+
+        <div className="rounded-2xl border border-[#3b5688]/70 bg-[linear-gradient(140deg,rgba(26,45,82,0.65),rgba(14,28,56,0.78))] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-4 font-semibold text-[#13a2ff]">Resource Management</h2>
+              <p className="mt-1 text-sm text-[#d7e4ff]">Add, update, or remove resources</p>
+            </div>
+
+            <button
+              onClick={handleAdd}
+              className="inline-flex items-center gap-2 rounded-xl border border-[#4f7fe3] px-5 py-2.5 font-semibold text-white transition-all duration-200"
+              style={{
+                background: 'linear-gradient(135deg, #0b63e5 0%, #1b74ee 100%)',
+                boxShadow: '0 8px 22px rgba(11,99,229,0.35)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 12px 28px rgba(11,99,229,0.46)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 8px 22px rgba(11,99,229,0.35)';
+              }}
+            >
+              <Plus className="h-5 w-5" />
+              Add Resource
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <div className="overflow-hidden rounded-2xl border border-[#3a517f]/75 bg-[linear-gradient(160deg,rgba(15,31,59,0.82),rgba(8,19,42,0.9))] shadow-[0_18px_40px_rgba(1,7,23,0.45)]">
         {loading ? (
           <div className="flex justify-center py-12">
             <div
@@ -281,44 +339,52 @@ export const AdminPanel: React.FC = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full table-fixed border-collapse text-left">
               <thead>
-                <tr className="bg-input text-xs uppercase tracking-wider text-secondary border-b border-border transition-colors duration-300">
-                  <th className="px-6 py-4 font-medium">Name</th>
-                  <th className="px-6 py-4 font-medium">Type</th>
-                  <th className="px-6 py-4 font-medium">Location</th>
-                  <th className="px-6 py-4 font-medium">Status</th>
-                  <th className="px-6 py-4 font-medium text-right">Actions</th>
+                <tr className="border-b border-[#355081] bg-[rgba(13,27,51,0.86)] text-xs uppercase tracking-[0.08em] text-[#d3e0ff]">
+                  <th className="w-[30%] px-6 py-4 font-semibold">Name</th>
+                  <th className="w-[18%] px-6 py-4 font-semibold">Type</th>
+                  <th className="w-[23%] px-6 py-4 font-semibold">Location</th>
+                  <th className="w-[17%] px-6 py-4 font-semibold">Status</th>
+                  <th className="w-[12%] px-6 py-4 text-right font-semibold">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-[#2f476f]">
                 {resources.map(resource => (
-                  <tr key={resource.id} className="hover:bg-input/50 transition-colors">
-                    <td className="px-6 py-4 text-primary font-medium">{resource.name}</td>
-                    <td className="px-6 py-4 text-muted">{resource.type}</td>
-                    <td className="px-6 py-4 text-muted">{resource.location}</td>
-                    <td className="px-6 py-4">
+                  <tr key={resource.id} className="transition-colors duration-200 hover:bg-[rgba(37,58,99,0.42)]">
+                    <td className="px-6 py-5 text-base font-semibold text-[#33b8ff]">
+                      <span className="block truncate" title={resource.name}>{resource.name}</span>
+                    </td>
+                    <td className="px-6 py-5 text-base text-[#d4dcf1]">
+                      <span className="block truncate uppercase tracking-wide" title={resource.type}>{resource.type}</span>
+                    </td>
+                    <td className="px-6 py-5 text-base text-[#c7d5f1]">
+                      <span className="block truncate" title={resource.location}>{resource.location}</span>
+                    </td>
+                    <td className="px-6 py-5 align-middle">
                       <span
-                        className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                        className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-wide ${
                           resource.status === 'ACTIVE'
-                            ? 'bg-green-500/10 text-green-500'
-                            : 'bg-red-500/10 text-red-500'
+                            ? 'bg-emerald-400/15 text-emerald-300 shadow-[0_0_14px_rgba(74,222,128,0.25)]'
+                            : 'bg-red-500/15 text-rose-300 shadow-[0_0_14px_rgba(244,63,94,0.25)]'
                         }`}
                       >
                         {resource.status ? resource.status.replace('_', ' ') : 'UNKNOWN'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
+                    <td className="px-6 py-5 text-right align-middle">
+                      <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => handleEdit(resource.id)}
-                          className="p-2 text-secondary hover:text-primary bg-input rounded-lg border border-border transition-colors"
+                          className="rounded-lg border border-[#40609a] bg-[rgba(17,34,66,0.8)] p-2 text-[#ced9f2] transition-colors hover:border-[#5d84d2] hover:text-white"
+                          aria-label={`Edit ${resource.name}`}
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(resource.id)}
-                          className="p-2 text-secondary hover:text-red-500 bg-input rounded-lg border border-border transition-colors"
+                          className="rounded-lg border border-[#40609a] bg-[rgba(17,34,66,0.8)] p-2 text-[#ced9f2] transition-colors hover:border-red-400/60 hover:text-red-300"
+                          aria-label={`Delete ${resource.name}`}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -328,7 +394,7 @@ export const AdminPanel: React.FC = () => {
                 ))}
                 {resources.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-secondary">
+                    <td colSpan={5} className="px-6 py-12 text-center text-[#afc2e8]">
                       No resources found. Click "Add Resource" to create one.
                     </td>
                   </tr>
@@ -336,7 +402,7 @@ export const AdminPanel: React.FC = () => {
               </tbody>
             </table>
 
-            <div className="flex justify-end px-6 py-5 border-t border-border bg-surface">
+            <div className="flex justify-end border-t border-[#2f476f] bg-[rgba(9,20,44,0.82)] px-6 py-5">
               <button
                 type="button"
                 onClick={handleDownloadPDF}

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Resource } from '../types/Resource';
 import { resourceApi } from '../api/resourceApi';
-import { Search, Filter, MapPin, Users, Activity, Settings } from 'lucide-react';
+import { Search, Filter, MapPin, Users, Activity, SunMedium, Settings, LayoutGrid, ShieldAlert } from 'lucide-react';
 
 type ResourceWithImage = Resource & {
   image?: string;
@@ -10,6 +11,8 @@ type ResourceWithImage = Resource & {
 const LOCAL_IMAGE_KEY = 'resource_uploaded_images';
 
 export const Catalogue: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [resources, setResources] = useState<ResourceWithImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -129,6 +132,15 @@ export const Catalogue: React.FC = () => {
   });
 
   const uniqueTypes = Array.from(new Set(resources.map((r) => r.type)));
+  const capacityOptions = Array.from(
+    new Set(
+      resources
+        .map((resource) => Number(resource.capacity))
+        .filter((value) => Number.isFinite(value) && value > 0)
+    )
+  ).sort((a, b) => a - b);
+  const isCatalogueTab = location.pathname === '/dashboard/facilities';
+  const isAdminTab = location.pathname === '/dashboard/facilities/admin';
 
   const getFilteredMetadataEntries = (resource: ResourceWithImage) => {
     const hiddenKeys = new Set([
@@ -148,24 +160,68 @@ export const Catalogue: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center bg-surface p-6 rounded-xl border border-border transition-colors duration-300">
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary w-5 h-5" />
+    <div className="mx-auto max-w-[1380px] space-y-7">
+      <div className="px-1 py-1">
+        <div className="flex items-center justify-between gap-3">
+          <div className="inline-flex items-center gap-3">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-[#1742a6] text-xs font-bold text-white shadow-[0_5px_14px_rgba(22,66,166,0.45)]">
+              S
+            </span>
+            <span className="text-base font-semibold tracking-tight text-[#8fb0ff]">Smart Campus</span>
+          </div>
+          <div className="ml-auto inline-flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => navigate('/dashboard/facilities')}
+              className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+                isCatalogueTab
+                  ? 'border-[#86a8ff63] bg-[linear-gradient(145deg,rgba(47,73,128,0.62),rgba(25,43,84,0.72))] text-primary shadow-[0_10px_24px_rgba(21,50,112,0.45)]'
+                  : 'border-transparent text-[#9ab1e4] hover:border-[#86a8ff3a] hover:bg-[rgba(39,61,109,0.45)] hover:text-primary'
+              }`}
+            >
+              <LayoutGrid className={`h-4 w-4 ${isCatalogueTab ? 'text-[#b8cbff]' : 'text-[#8ea6d7]'}`} />
+              Catalogue
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/dashboard/facilities/admin')}
+              className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+                isAdminTab
+                  ? 'border-[#86a8ff63] bg-[linear-gradient(145deg,rgba(47,73,128,0.62),rgba(25,43,84,0.72))] text-primary shadow-[0_10px_24px_rgba(21,50,112,0.45)]'
+                  : 'border-transparent text-[#9ab1e4] hover:border-[#86a8ff3a] hover:bg-[rgba(39,61,109,0.45)] hover:text-primary'
+              }`}
+            >
+              <ShieldAlert className={`h-4 w-4 ${isAdminTab ? 'text-[#b8cbff]' : 'text-[#8ea6d7]'}`} />
+              Admin
+            </button>
+            <button
+              type="button"
+              aria-label="System settings"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-transparent text-[#94acdc] transition-all duration-200 hover:border-[#86a8ff3a] hover:bg-[rgba(39,61,109,0.45)] hover:text-[#c1d2ff]"
+            >
+              <SunMedium className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-1 flex flex-col gap-4 rounded-2xl border border-[#314a76]/75 bg-[rgba(7,18,40,0.58)] p-4 shadow-[0_14px_30px_rgba(3,10,28,0.45)] backdrop-blur-md transition-colors duration-300 md:flex-row md:flex-nowrap md:items-center md:justify-center">
+        <div className="relative w-full md:flex-1">
+          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#7f9ad0]" />
           <input
             type="text"
-            placeholder="Search by name or location..."
-            className="w-full bg-input border border-border text-primary rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:border-purple-500 transition-colors"
+            placeholder="        Search by name or location..."
+            className="w-full rounded-xl border border-[#365180]/90 bg-[rgba(12,26,52,0.52)] py-3 pl-10 pr-4 text-primary transition-colors placeholder:text-[#7f9ad0] focus:border-[#6f94ef] focus:outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-        <div className="flex gap-4 w-full md:w-auto">
-          <div className="relative flex-1 md:w-48">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary w-4 h-4" />
+        <div className="flex w-full gap-3 md:w-auto">
+          <div className="relative flex-1 md:w-60">
+            <Filter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7f9ad0]" />
             <select
-              className="w-full bg-input border border-border text-primary rounded-lg pl-9 pr-4 py-2.5 focus:outline-none focus:border-purple-500 appearance-none transition-colors"
+              className="w-full appearance-none rounded-xl border border-[#365180]/90 bg-[rgba(12,26,52,0.52)] py-3 pl-11 pr-4 text-primary transition-colors focus:border-[#6f94ef] focus:outline-none"
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
             >
@@ -178,17 +234,22 @@ export const Catalogue: React.FC = () => {
             </select>
           </div>
 
-          <div className="relative flex-1 md:w-48">
-            <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary w-4 h-4" />
-            <input
-              type="number"
-              placeholder="Min Capacity"
-              className="w-full bg-input border border-border text-primary rounded-lg pl-9 pr-4 py-2.5 focus:outline-none focus:border-purple-500 transition-colors"
+          <div className="relative flex-1 md:w-56">
+            <Users className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7f9ad0]" />
+             <select
+              className="w-full appearance-none rounded-xl border border-[#365180]/90 bg-[rgba(12,26,52,0.52)] py-3 pl-11 pr-4 text-primary transition-colors focus:border-[#6f94ef] focus:outline-none"
               value={minCapacity}
               onChange={(e) =>
                 setMinCapacity(e.target.value ? Number(e.target.value) : '')
               }
-            />
+            >
+              <option value="">Min Capacity</option>
+              {capacityOptions.map((capacity) => (
+                <option key={capacity} value={capacity}>
+                  {capacity}+
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>

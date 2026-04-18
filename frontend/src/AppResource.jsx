@@ -4,7 +4,7 @@ import { AdminPanel } from './components/AdminPanel';
 import { LayoutGrid, ShieldAlert, Sun, Moon } from 'lucide-react';
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'catalogue' | 'admin'>('catalogue');
+  const [activeTab, setActiveTab] = useState('catalogue');
   const [isDarkMode, setIsDarkMode] = useState(true);
 
   useEffect(() => {
@@ -86,18 +86,6 @@ function App() {
                           border: '1px solid transparent'
                         }
                   }
-                  onMouseEnter={(e) => {
-                    if (activeTab !== 'catalogue') {
-                      e.currentTarget.style.color = 'var(--text-primary)';
-                      e.currentTarget.style.background = 'rgba(10, 132, 255, 0.08)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (activeTab !== 'catalogue') {
-                      e.currentTarget.style.color = 'var(--text-secondary)';
-                      e.currentTarget.style.background = 'transparent';
-                    }
-                  }}
                 >
                   <LayoutGrid className="w-4 h-4" />
                   Catalogue
@@ -118,41 +106,18 @@ function App() {
                           border: '1px solid transparent'
                         }
                   }
-                  onMouseEnter={(e) => {
-                    if (activeTab !== 'admin') {
-                      e.currentTarget.style.color = 'var(--text-primary)';
-                      e.currentTarget.style.background = 'rgba(10, 132, 255, 0.08)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (activeTab !== 'admin') {
-                      e.currentTarget.style.color = 'var(--text-secondary)';
-                      e.currentTarget.style.background = 'transparent';
-                    }
-                  }}
                 >
                   <ShieldAlert className="w-4 h-4" />
                   Admin
                 </button>
               </nav>
 
-              <div
-                className="w-px h-6 mx-1"
-                style={{ background: 'var(--border-default)' }}
-              ></div>
+              <div className="w-px h-6 mx-1" style={{ background: 'var(--border-default)' }}></div>
 
               <button
                 onClick={toggleTheme}
                 className="p-2 rounded-md transition-colors"
                 style={{ color: 'var(--text-secondary)' }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = 'var(--text-primary)';
-                  e.currentTarget.style.background = 'var(--bg-surface)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'var(--text-secondary)';
-                  e.currentTarget.style.background = 'transparent';
-                }}
                 aria-label="Toggle theme"
               >
                 {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -164,10 +129,7 @@ function App() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h2
-            className="text-3xl font-bold tracking-tight"
-            style={{ color: 'var(--text-primary)' }}
-          >
+          <h2 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
             {activeTab === 'catalogue' ? 'Resource Catalogue' : 'Admin Dashboard'}
           </h2>
 

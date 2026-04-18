@@ -1,19 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Resource } from '../types/Resource';
 import { resourceApi } from '../api/resourceApi';
 import { Save, X, Plus, Trash2 } from 'lucide-react';
 
-interface ResourceFormProps {
-  resourceId?: string;
-  onSuccess: () => void;
-  onCancel: () => void;
-}
-
-export const ResourceForm: React.FC<ResourceFormProps> = ({ resourceId, onSuccess, onCancel }) => {
+export const ResourceForm = ({ resourceId, onSuccess, onCancel }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const [formData, setFormData] = useState<Omit<Resource, 'id'>>({
+  const [formData, setFormData] = useState({
     name: '',
     type: '',
     capacity: 1,
@@ -23,7 +16,7 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({ resourceId, onSucces
     metadata: {}
   });
 
-  const [metadataEntries, setMetadataEntries] = useState<{ key: string; value: string }[]>([
+  const [metadataEntries, setMetadataEntries] = useState([
     { key: '', value: '' }
   ]);
 
@@ -33,7 +26,7 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({ resourceId, onSucces
     }
   }, [resourceId]);
 
-  const loadResource = async (id: string) => {
+  const loadResource = async (id) => {
     try {
       setLoading(true);
       const data = await resourceApi.getById(id);
@@ -60,7 +53,7 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({ resourceId, onSucces
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -68,7 +61,7 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({ resourceId, onSucces
     }));
   };
 
-  const handleWindowChange = (index: number, value: string) => {
+  const handleWindowChange = (index, value) => {
     const newWindows = [...formData.availabilityWindows];
     newWindows[index] = value;
     setFormData(prev => ({ ...prev, availabilityWindows: newWindows }));
@@ -81,7 +74,7 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({ resourceId, onSucces
     }));
   };
 
-  const removeWindow = (index: number) => {
+  const removeWindow = (index) => {
     const newWindows = formData.availabilityWindows.filter((_, i) => i !== index);
     setFormData(prev => ({
       ...prev,
@@ -89,7 +82,7 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({ resourceId, onSucces
     }));
   };
 
-  const handleMetadataChange = (index: number, field: 'key' | 'value', value: string) => {
+  const handleMetadataChange = (index, field, value) => {
     const newEntries = [...metadataEntries];
     newEntries[index][field] = value;
     setMetadataEntries(newEntries);
@@ -99,11 +92,11 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({ resourceId, onSucces
     setMetadataEntries(prev => [...prev, { key: '', value: '' }]);
   };
 
-  const removeMetadataEntry = (index: number) => {
+  const removeMetadataEntry = (index) => {
     setMetadataEntries(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -112,7 +105,7 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({ resourceId, onSucces
       return;
     }
 
-    const metadata: Record<string, string> = {};
+    const metadata = {};
     metadataEntries.forEach(entry => {
       if (entry.key.trim() && entry.value.trim()) {
         metadata[entry.key.trim()] = entry.value.trim();
@@ -143,14 +136,14 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({ resourceId, onSucces
   const inputClassName =
     'w-full rounded-lg px-4 py-2.5 transition-all duration-200 focus:outline-none';
 
-  const inputStyle: React.CSSProperties = {
+  const inputStyle = {
     background: 'rgba(11, 18, 32, 0.86)',
     border: '1.5px solid rgba(95, 141, 240, 0.28)',
     color: 'var(--text-primary)',
     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.02)'
   };
 
-  const iconButtonStyle: React.CSSProperties = {
+  const iconButtonStyle = {
     background: 'rgba(11, 18, 32, 0.86)',
     border: '1.5px solid rgba(95, 141, 240, 0.24)',
     color: 'var(--text-secondary)'

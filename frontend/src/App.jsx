@@ -15,6 +15,8 @@ import TechnicianDashboardPage from "./pages/tickets/technician/TechnicianDashbo
 import TechnicianSolutionPage from "./pages/tickets/technician/TechnicianSolutionPage.jsx";
 import AboutPage from "./pages/AboutPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
+import { Catalogue } from "./components/Catalogue.tsx";
+import { AdminPanel } from "./components/AdminPanel.tsx";
 
 
 function App() {
@@ -37,7 +39,8 @@ function App() {
           element={<DashboardLayout />}
         >
           <Route index element={<DashboardPage />} />
-          <Route path="facilities" element={<DashboardSectionPage title="Facilities" description="Manage campus facilities and resources." />} />
+          <Route path="facilities" element={<Catalogue />} />
+          <Route path="facilities/admin" element={<AdminPanel />} />
           <Route path="bookings" element={<DashboardSectionPage title="Bookings" description="View and manage booking requests." />} />
           <Route path="incidents" element={<TicketListPage />} />
           <Route path="incidents/new" element={<NewTicketPage />} />

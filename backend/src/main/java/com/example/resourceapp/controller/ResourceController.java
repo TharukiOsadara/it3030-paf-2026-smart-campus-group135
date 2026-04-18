@@ -3,7 +3,6 @@ package com.example.resourceapp.controller;
 import com.example.resourceapp.model.Resource;
 import com.example.resourceapp.service.ResourceService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,12 +12,11 @@ import java.util.List;
 // Member 1 Logic Implementation: Resource Controller endpoints
 @RestController
 @RequestMapping("/api/resources")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000"})
 public class ResourceController {
 
     private final ResourceService resourceService;
 
-    @Autowired
     public ResourceController(ResourceService resourceService) {
         this.resourceService = resourceService;
     }

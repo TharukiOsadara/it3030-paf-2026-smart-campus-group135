@@ -1,0 +1,14 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="capGrad" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5A84F6"/>
+      <stop offset="1" stop-color="#9B75EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="8" y="8" width="48" height="48" rx="14" fill="url(#capGrad)"/>
+
+  <path d="M32 22L18 28.8L32 35.6L46 28.8L32 22Z" stroke="white" stroke-width="3.2" stroke-linejoin="round"/>
+  <path d="M23.5 32.3V37.6C23.5 39.4 27.3 41.6 32 41.6C36.7 41.6 40.5 39.4 40.5 37.6V32.3" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M46 29V36" stroke="white" stroke-width="3.2" stroke-linecap="round"/>
+</svg>

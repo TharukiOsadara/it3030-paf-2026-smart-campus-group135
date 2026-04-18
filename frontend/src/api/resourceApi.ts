@@ -1,6 +1,7 @@
 import { Resource } from '../types/Resource';
 
-const BASE_URL = 'http://localhost:8081/api/resources';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const BASE_URL = `${API_BASE_URL}/api/resources`;
 
 export const resourceApi = {
   getAll: async (): Promise<Resource[]> => {

@@ -3,7 +3,6 @@ package com.example.resourceapp.service;
 import com.example.resourceapp.model.Resource;
 import com.example.resourceapp.repository.ResourceRepository;
 import com.example.resourceapp.exception.ResourceNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,7 +12,6 @@ public class ResourceService {
 
     private final ResourceRepository resourceRepository;
 
-    @Autowired
     public ResourceService(ResourceRepository resourceRepository) {
         this.resourceRepository = resourceRepository;
     }
