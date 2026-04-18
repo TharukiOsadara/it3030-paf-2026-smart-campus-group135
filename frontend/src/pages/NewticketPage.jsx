@@ -103,7 +103,7 @@ export default function NewTicketPage() {
         }
       }
 
-      navigate("/dashboard/my-tickets");
+      navigate("/dashboard/my-tickets?tab=total");
     } catch (submitError) {
       setError(submitError.message || "Failed to create ticket");
     } finally {
