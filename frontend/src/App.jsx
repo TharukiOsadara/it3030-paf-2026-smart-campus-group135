@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout.jsx";
@@ -7,13 +6,13 @@ import LoaderPage from "./components/Loader.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import DashboardSectionPage from "./pages/DashboardSectionPage.jsx";
-import TicketListPage from "./pages/TicketListPage.jsx";
-import NewTicketPage from "./pages/NewTicketPage.jsx";
-import TicketDetailPage from "./pages/TicketDetailsPage.jsx";
-import UserTicketDashboardPage from "./pages/UserTicketDashboardPage.jsx";
-import UserTicketDetailsPage from "./pages/UserTicketDetailsPage.jsx";
-import TechnicianDashboardPage from "./pages/TechnicianDashboardPage.jsx";
-import TechnicianSolutionPage from "./pages/TechnicianSolutionPage.jsx";
+import TicketListPage from "./pages/tickets/admin/AdiminTicketlistpage.jsx";
+import NewTicketPage from "./pages/tickets/user/UserNewticketPage.jsx";
+import TicketDetailPage from "./pages/tickets/admin/AdminTicketDetailsPage.jsx";
+import UserTicketDashboardPage from "./pages/tickets/user/UserTicketDashboardPage.jsx";
+import UserTicketDetailsPage from "./pages/tickets/user/UserTicketDetailsPage.jsx";
+import TechnicianDashboardPage from "./pages/tickets/technician/TechnicianDashboardPage.jsx";
+import TechnicianSolutionPage from "./pages/tickets/technician/TechnicianSolutionPage.jsx";
 import AboutPage from "./pages/AboutPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
 
@@ -67,8 +66,6 @@ function App() {
               />
             }
           />
-          <Route path="/login" element={<Navigate to="/" replace />} />
-          <Route path="/signup" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
